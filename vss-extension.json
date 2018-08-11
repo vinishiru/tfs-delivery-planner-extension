@@ -1,0 +1,45 @@
+{
+    "manifestVersion": 1,
+    "id": "tfs-branch-review-extension",
+    "version": "0.1.0",
+    "name": "TFS Branch Review",
+    "description": "Um hub para verificar a situaçao das PBIs/tasks de determinado branch.",
+    "publisher": "simply-devops",
+    "targets": [
+        {
+            "id": "Microsoft.VisualStudio.Services"
+            }
+        ],
+    "icons": {
+        "default": "images/logo.png"
+     },
+    "contributions": [
+        {
+            "id": "Fabrikam.HelloWorld",
+            "type": "ms.vss-web.hub",
+            "description": "Adds a 'Hello' hub to the Work hub group.",
+            "targets": [
+                "ms.vss-work-web.work-hub-group"
+                ],
+            "properties": {
+                "name": "Hello",
+                "order": 99,
+                "uri": "hello-world.html"
+            }
+        }
+    ],
+    "scopes": [
+        "vso.work"
+    ],
+    "files": [
+        {
+            "path": "hello-world.html", "addressable": true
+        },
+        {
+            "path": "sdk/scripts", "addressable": true
+        },
+        {
+            "path": "images/logo.png", "addressable": true
+        }
+    ]
+}
