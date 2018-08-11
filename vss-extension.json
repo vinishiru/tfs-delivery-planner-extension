@@ -15,9 +15,9 @@
      },
     "contributions": [
         {
-            "id": "Fabrikam.HelloWorld",
+            "id": "Simply.BranchReview",
             "type": "ms.vss-web.hub",
-            "description": "Adds a 'Hello' hub to the Work hub group.",
+            "description": "Um hub para verificar a situaçao das PBIs/tasks de determinado branch.",
             "targets": [
                 "ms.vss-work-web.work-hub-group"
                 ],
