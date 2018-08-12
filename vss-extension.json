@@ -29,7 +29,8 @@
         }
     ],
     "scopes": [
-        "vso.work"
+        "vso.work",
+        "vso.code"
     ],
     "files": [
         {
