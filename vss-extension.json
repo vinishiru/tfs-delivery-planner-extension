@@ -32,6 +32,9 @@
         "vso.work",
         "vso.code"
     ],
+    "categories": [
+        "Plan and track"
+    ],
     "files": [
         {
             "path": "hello-world.html", "addressable": true
