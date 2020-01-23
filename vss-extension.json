@@ -1,9 +1,9 @@
 {
     "manifestVersion": 1,
-    "id": "tfs-branch-review-extension",
+    "id": "tfs-delivery-planner-extension",
     "version": "0.1.0",
-    "name": "TFS Branch Review",
-    "description": "Um hub para verificar a situaçao das PBIs/tasks de determinado branch.",
+    "name": "Simply Delivery Planner",
+    "description": "Um hub para realizar um planejamento de PBIs entregáveis.",
     "publisher": "simply-devops",
     "targets": [
         {
@@ -15,14 +15,14 @@
      },
     "contributions": [
         {
-            "id": "Simply.BranchReview",
+            "id": "Simply.DeliveryPlanner",
             "type": "ms.vss-web.hub",
-            "description": "Um hub para verificar a situaçao das PBIs/tasks de determinado branch.",
+            "description": "Um hub para realizar um planejamento de PBIs entregáveis.",
             "targets": [
                 "ms.vss-work-web.work-hub-group"
                 ],
             "properties": {
-                "name": "Hello",
+                "name": "Delivery Planner",
                 "order": 99,
                 "uri": "hello-world.html"
             }

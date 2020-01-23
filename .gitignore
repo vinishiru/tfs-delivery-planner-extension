@@ -1,2 +1,3 @@
 sdk/
-simply-devops.tfs-branch-review-extension-0.1.0.vsix
+node_modules/
+simply-devops.tfs-delivery-planner-extension-0.1.0.vsix
