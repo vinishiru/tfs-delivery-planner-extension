@@ -40,9 +40,6 @@
             "path": "hello-world.html", "addressable": true
         },
         {
-            "path": "sdk/scripts", "addressable": true
-        },
-        {
             "path": "images/logo.png", "addressable": true
         }
     ]
