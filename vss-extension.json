@@ -1,7 +1,7 @@
 {
   "manifestVersion": 1,
   "id": "simply-delivery-planner",
-  "version": "0.1.1",
+  "version": "0.1.5",
   "name": "Simply Delivery Planner",
   "scopes": [],
   "description": "Extensão para organização de PBIs entregáveis.",
@@ -89,7 +89,7 @@
       "targets": ["ms.vss-work-web.work-hub-group"],
       "type": "ms.vss-web.hub",
       "properties": {
-        "name": "Simply Delivery Planner",
+        "name": "Delivery Planner",
         "order": 100,
         "uri": "static/index.html"
       }
