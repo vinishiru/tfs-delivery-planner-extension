@@ -6,11 +6,7 @@
     "name": "Delivery Planner",
     "description": "Azure DevOps Extension",
     "categories": [
-        "Azure Repos",
-        "Azure Boards",
-        "Azure Pipelines",
-        "Azure Test Plans",
-        "Azure Artifacts"
+        "Azure Boards"
     ],
     "targets": [
         {
