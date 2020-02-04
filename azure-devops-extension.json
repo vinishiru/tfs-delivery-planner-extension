@@ -2,7 +2,7 @@
     "manifestVersion": 1,
     "id": "simply-delivery-planner",
     "publisher": "simply-devops",
-    "version": "1.0.2",
+    "version": "1.0.3",
     "name": "Delivery Planner",
     "description": "Azure DevOps Extension",
     "categories": [
@@ -11,6 +11,22 @@
     "targets": [
         {
             "id": "Microsoft.VisualStudio.Services"
+        }
+    ],
+    "contributions": [
+        {
+            "id": "Simply.DeliveryPlanner",
+            "type": "ms.vss-web.hub",
+            "description": "Planejador de entregadas da Simply.",
+            "targets": [
+                "ms.vss-work-web.work-hub-group"
+            ],
+            "properties": {
+                "name": "Delivery Planner",
+                "uri": "dist/Main.html",
+                "icon": "asset://static/sample-icon.png",
+                "supportsMobile": true
+            }
         }
     ],
     "icons": {

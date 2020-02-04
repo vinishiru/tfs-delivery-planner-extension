@@ -9,7 +9,7 @@ import { IHeaderCommandBarItem } from "azure-devops-ui/HeaderCommandBar";
 import { Page } from "azure-devops-ui/Page";
 import { Tab, TabBar, TabSize } from "azure-devops-ui/Tabs";
 
-import { OverviewTab } from "./OverviewTab"; 
+import { OverviewTab } from "./OverviewTab";
 import { NavigationTab } from "./NavigationTab";
 import { ExtensionDataTab } from "./ExtensionDataTab";
 import { MessagesTab } from "./MessagesTab";
@@ -62,7 +62,7 @@ class HubContent extends React.Component<{}, IHubContentState> {
                     <Tab name="Messages" id="messages" />
                 </TabBar>
 
-                { this.getPageContent() }
+                {this.getPageContent()}
             </Page>
         );
     }
@@ -92,24 +92,24 @@ class HubContent extends React.Component<{}, IHubContentState> {
     private getCommandBarItems(): IHeaderCommandBarItem[] {
         return [
             {
-              id: "panel",
-              text: "Panel",
-              onActivate: () => { this.onPanelClick() },
-              iconProps: {
-                iconName: 'Add'
-              },
-              isPrimary: true,
-              tooltipProps: {
-                text: "Open a panel with custom extension content"
-              }
+                id: "panel",
+                text: "Panel",
+                onActivate: () => { this.onPanelClick() },
+                iconProps: {
+                    iconName: 'Add'
+                },
+                isPrimary: true,
+                tooltipProps: {
+                    text: "Open a panel with custom extension content"
+                }
             },
             {
-              id: "messageDialog",
-              text: "Message",
-              onActivate: () => { this.onMessagePromptClick() },
-              tooltipProps: {
-                text: "Open a simple message dialog"
-              }
+                id: "messageDialog",
+                text: "Message",
+                onActivate: () => { this.onMessagePromptClick() },
+                tooltipProps: {
+                    text: "Open a simple message dialog"
+                }
             },
             {
                 id: "fullScreen",
@@ -120,12 +120,12 @@ class HubContent extends React.Component<{}, IHubContentState> {
                 onActivate: () => { this.onToggleFullScreenMode() }
             },
             {
-              id: "customDialog",
-              text: "Custom Dialog",
-              onActivate: () => { this.onCustomPromptClick() },
-              tooltipProps: {
-                text: "Open a dialog with custom extension content"
-              }
+                id: "customDialog",
+                text: "Custom Dialog",
+                onActivate: () => { this.onCustomPromptClick() },
+                tooltipProps: {
+                    text: "Open a dialog with custom extension content"
+                }
             }
         ];
     }
