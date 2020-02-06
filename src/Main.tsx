@@ -18,6 +18,7 @@ class DeliveryPlanner extends React.Component<{}, IDeliveryPlannerState> {
     constructor(props: {}) {
         super(props);
 
+        this.state = {};
     }
 
     public async componentDidMount() {
@@ -27,13 +28,21 @@ class DeliveryPlanner extends React.Component<{}, IDeliveryPlannerState> {
         this.setState({ nomeUsuario: SDK.getUser().displayName });
     }
 
-    public reender(): JSX.Element {
+    public render(): JSX.Element {
         return (
             <Page className="flex-grow">
                 <Header title="Delivery Planner"
                     commandBarItems={this.getCommandBarItems()}
-                    description="Descrição do componnente."
+                    description="Descrição do componente."
                     titleSize={TitleSize.Large} />
+
+                <TabBar
+                    onSelectedTabChanged={this.criarNovaEntrega}
+                    selectedTabId="entregasPlanejadas"
+                    tabSize={TabSize.Compact}>
+
+                    <Tab name="Entregas Planejadas" id="entregasPlanejadas" />
+                </TabBar>
 
                 {this.getPageContent()}
             </Page>
@@ -47,15 +56,15 @@ class DeliveryPlanner extends React.Component<{}, IDeliveryPlannerState> {
                     primaryText="Delivery Planner"
                     secondaryText={
                         <div>
-                            <span>Olá {this.state.nomeUsuario}!</span>
-                            <span>
+                            <p>Olá {this.state.nomeUsuario}!</p>
+                            <p>
                                 Planeje entregas, facilite o acompanhamento dos seus projetos e tenha uma <strong>estimativa</strong> de entrega!
-                        </span>
+                        </p>
                         </div>
                     }
                     imageAltText="Delivery Planner"
-                    imagePath={""}
-                    actionText="Nova Entrega"
+                    imagePath="../static/checklist.png"
+                    actionText="Criar Entrega"
                     actionType={ZeroDataActionType.ctaButton}
                     onActionClick={this.criarNovaEntrega}
                 />
@@ -66,15 +75,15 @@ class DeliveryPlanner extends React.Component<{}, IDeliveryPlannerState> {
     private getCommandBarItems(): IHeaderCommandBarItem[] {
         return [
             {
-                id: "panel",
-                text: "Panel",
+                id: "criarEntrega",
+                text: "Criar Entrega",
                 onActivate: () => { this.criarNovaEntrega() },
                 iconProps: {
                     iconName: 'Add'
                 },
                 isPrimary: true,
                 tooltipProps: {
-                    text: "Planejar nova entrega."
+                    text: "Criar nova entrega."
                 }
             }
         ];

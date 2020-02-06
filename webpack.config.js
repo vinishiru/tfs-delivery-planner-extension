@@ -14,9 +14,9 @@ fs.readdirSync(samplesDir).filter(dir => {
 });
 
 module.exports = {
-    entry: entries,
+    entry: './src/Main.tsx',
     output: {
-        filename: "[name]/[name].js"
+        filename: "[name].js"
     },
     resolve: {
         extensions: [".ts", ".tsx", ".js"],
@@ -54,6 +54,6 @@ module.exports = {
         ]
     },
     plugins: [
-        new CopyWebpackPlugin([ { from: "**/*.html", context: "src/Samples" }])
+        new CopyWebpackPlugin([{ from: "*.html", context: "src/" }])
     ]
 };
