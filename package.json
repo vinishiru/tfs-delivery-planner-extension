@@ -13,6 +13,7 @@
     "url": ""
   },
   "scripts": {
+    "start": "react-scripts start",
     "clean": "rimraf ./dist",
     "compile": "npm run clean && webpack --mode production",
     "compile:dev": "npm run clean && webpack --mode development",
@@ -23,16 +24,19 @@
     "publish-extension": "tfx extension publish --manifest-globs azure-devops-extension.json src/Samples/**/*.json"
   },
   "dependencies": {
+    "@types/jest": "^25.1.2",
+    "@types/node": "^13.7.0",
     "azure-devops-extension-api": "~1.157.0",
     "azure-devops-extension-sdk": "~2.0.11",
     "azure-devops-ui": "~2.164.0",
     "node-sass": "^4.13.1",
     "react": "~16.8.1",
-    "react-dom": "~16.8.1"
+    "react-dom": "~16.8.1",
+    "react-scripts": "^3.3.1"
   },
   "devDependencies": {
-    "@types/react": "~16.8.2",
-    "@types/react-dom": "~16.8.0",
+    "@types/react": "^16.8.25",
+    "@types/react-dom": "^16.8.5",
     "base64-inline-loader": "^1.1.1",
     "copy-webpack-plugin": "^4.5.4",
     "css-loader": "~1.0.0",
@@ -43,7 +47,19 @@
     "tfx-cli": "^0.6.3",
     "ts-loader": "~5.2.2",
     "typescript": "^2.9.2",
-    "webpack": "^4.22.0",
+    "webpack": "^4.41.5",
     "webpack-cli": "^3.1.2"
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
   }
 }

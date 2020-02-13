@@ -1,4 +1,5 @@
 import * as React from "react";
+import * as ReactDOM from "react-dom";
 import * as SDK from 'azure-devops-extension-sdk'
 
 import { Header, TitleSize } from "azure-devops-ui/Header";
@@ -6,8 +7,6 @@ import { IHeaderCommandBarItem } from "azure-devops-ui/HeaderCommandBar";
 import { Page } from "azure-devops-ui/Page";
 import { Tab, TabBar, TabSize } from "azure-devops-ui/Tabs";
 import { ZeroData, ZeroDataActionType } from "azure-devops-ui/ZeroData";
-
-import { showRootComponent } from "./Common"
 
 export interface IDeliveryPlannerState {
     nomeUsuario?: string;
@@ -63,7 +62,7 @@ class DeliveryPlanner extends React.Component<{}, IDeliveryPlannerState> {
                         </div>
                     }
                     imageAltText="Delivery Planner"
-                    imagePath="../static/checklist.png"
+                    imagePath={require("../static/checklist.png")}
                     actionText="Criar Entrega"
                     actionType={ZeroDataActionType.ctaButton}
                     onActionClick={this.criarNovaEntrega}
@@ -95,4 +94,4 @@ class DeliveryPlanner extends React.Component<{}, IDeliveryPlannerState> {
 
 }
 
-showRootComponent(<DeliveryPlanner />);
+ReactDOM.render(<DeliveryPlanner />, document.getElementById("root"));
