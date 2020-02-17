@@ -1,14 +1,23 @@
 import * as React from "react";
 
 import { Panel } from "azure-devops-ui/Panel";
+import { FormItem } from "azure-devops-ui/FormItem";
 import { TextField, TextFieldWidth } from "azure-devops-ui/TextField";
+import { Toggle } from "azure-devops-ui/Toggle";
 
 interface IDeliveryPanelProps {
     onDismiss: () => void
+    deliveryId?: string;
+    name?: string;
+    description?: string;
+    booleano?: boolean;
 }
 
 interface IDeliveryPanelState {
-    expanded: boolean;
+    deliveryId?: string;
+    name?: string;
+    description?: string;
+    booleano?: boolean;
 }
 
 export class DeliveryPanel extends React.Component<IDeliveryPanelProps, IDeliveryPanelState> {
@@ -16,6 +25,7 @@ export class DeliveryPanel extends React.Component<IDeliveryPanelProps, IDeliver
     constructor(props: IDeliveryPanelProps) {
         super(props);
 
+        this.state = {};
         this.handleDismiss = this.handleDismiss.bind(this);
     }
 
@@ -24,15 +34,14 @@ export class DeliveryPanel extends React.Component<IDeliveryPanelProps, IDeliver
     }
 
     public render(): JSX.Element {
+
+        const { name, description, booleano } = this.state;
+
         return (
             <Panel
-                className="rhythm-vertical-16"
-                showSeparator={true}
                 onDismiss={this.handleDismiss}
                 titleProps={{ text: "Planejar Entrega" }}
-                description={
-                    "Dê um nome para sua entrega e adicione as PBIs necessárias para concluí-la."
-                }
+                description={"Dê um nome para sua entrega e adicione as PBIs necessárias para concluí-la."}
                 footerButtonProps={[
                     {
                         text: "Cancelar", onClick: () => { this.handleDismiss() }
@@ -41,26 +50,46 @@ export class DeliveryPanel extends React.Component<IDeliveryPanelProps, IDeliver
                         text: "Salvar", primary: true
                     }
                 ]}>
-                <TextField
-                    value="Nenhum"
-                    //onChange={(e, newValue) => (simpleObservable.value = newValue)}
-                    placeholder="Search keyword"
-                    width={TextFieldWidth.standard}
-                />
+                <div className="flex-column rhythm-vertical-16">
+                    <FormItem
+                        label={"Nome da entrega:"}
+                        message="Use an exciting spy name for identification"
+                    >
+                        <TextField
+                            value={name}
+                            onChange={(e, value) => this.setState({ name: value })}
+                            placeholder="ex: projeto do cliente A"
+                            width={TextFieldWidth.standard}
+                        />
+                    </FormItem>
 
-                <TextField
-                    value="Nenhum"
-                    //onChange={(e, newValue) => (simpleObservable.value = newValue)}
-                    placeholder="Search keyword"
-                    width={TextFieldWidth.standard}
-                />
+                    <FormItem
+                        label={"Descrição:"}
+                        message="Use an exciting spy name for identification"
+                    >
+                        <TextField
+                            autoAdjustHeight={true}
+                            value={description}
+                            onChange={(e, value) => this.setState({ description: value })}
+                            placeholder="ex: primeira parte do projeto do cliente A"
+                            multiline={true}
+                            width={TextFieldWidth.standard}
+                        />
+                    </FormItem>
+
+                    <Toggle
+                        offText={"Não"}
+                        onText={"Sim"}
+                        checked={booleano}
+                        onChange={(e, value) => this.setState({ booleano: value })}
+                    />
+                </div>
             </Panel>
         );
     }
 
     private handleDismiss() {
         this.props.onDismiss();
-        this.setState({ expanded: false });
     }
 
 }

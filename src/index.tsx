@@ -1,4 +1,3 @@
-import 'bootstrap/dist/css/bootstrap.min.css';
 import * as React from "react";
 
 import { Header, TitleSize } from "azure-devops-ui/Header";
@@ -10,29 +9,27 @@ import { IAzureDevOpsService } from "./Interfaces/IAzureDevOpsService";
 import { MoqAzureDevOpsService } from "./Services/MoqAzureDevOpsService";
 
 import { DeliveryPanel } from "./Components/DeliveryPanel";
+import { DeliveryItemCard } from "./Components/DeliveryItemCard";
 
 import { showRootComponent } from "./Common"
+import { IDeliveryItem } from "./Interfaces/IDeliveryItem";
 
 export interface IDeliveryPlannerState {
-    sdkService?: IAzureDevOpsService
     userDisplayName?: string;
     creatingNewDelivery: boolean
 }
 
-export interface IDeliveryPlannerProps {
-    sdkService: IAzureDevOpsService
-}
-
-class DeliveryPlanner extends React.Component<IDeliveryPlannerProps, IDeliveryPlannerState> {
+class DeliveryPlanner extends React.Component<{}, IDeliveryPlannerState> {
 
     sdkService: IAzureDevOpsService;
+    allDeliveryItens: IDeliveryItem[];
 
-    constructor(props: IDeliveryPlannerProps) {
+    constructor(props: {}) {
         super(props);
 
-        this.sdkService = props.sdkService;
+        this.sdkService = SdkService;
         this.state = { creatingNewDelivery: false };
-
+        this.allDeliveryItens = [];
         this.createNewDelivery = this.createNewDelivery.bind(this);
         this.handleDeliveryPanelDismiss = this.handleDeliveryPanelDismiss.bind(this);
     }
@@ -41,12 +38,16 @@ class DeliveryPlanner extends React.Component<IDeliveryPlannerProps, IDeliveryPl
         this.sdkService.initialize();
         await this.sdkService.ready();
 
+        this.allDeliveryItens = await this.sdkService.getAllDeliveryItens();
         this.setState({ userDisplayName: this.sdkService.getUserDisplayName() });
     }
 
     public render(): JSX.Element {
+        const items = this.allDeliveryItens.map(item =>
+            <DeliveryItemCard deliveryItem={item} />
+        );
         return (
-            <Page className="flex-grow">
+            <Page className="flex-grow rhythm-vertical-16">
                 <Header title="Delivery Planner"
                     commandBarItems={this.getCommandBarItems()}
                     description="Descrição do componente."
@@ -64,8 +65,12 @@ class DeliveryPlanner extends React.Component<IDeliveryPlannerProps, IDeliveryPl
                     <DeliveryPanel onDismiss={this.handleDeliveryPanelDismiss} />
                 )}
 
-                {this.getPageContent()}
-            </Page>
+                <div className="flex-column flex-center padding-16 rhythm-vertical-16">
+                    {items}
+                </div>
+                {/* 
+                {this.getPageContent()} */}
+            </Page >
         );
     }
 
@@ -119,6 +124,7 @@ class DeliveryPlanner extends React.Component<IDeliveryPlannerProps, IDeliveryPl
 
 }
 
-let sdkService = new MoqAzureDevOpsService();
+const SdkService = new MoqAzureDevOpsService();
+export default SdkService;
 
-showRootComponent(<DeliveryPlanner sdkService={sdkService} />);
+showRootComponent(<DeliveryPlanner />);

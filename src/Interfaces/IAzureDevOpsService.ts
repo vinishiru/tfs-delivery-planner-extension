@@ -1,5 +1,8 @@
+import { IDeliveryItem } from "./IDeliveryItem";
+
 export interface IAzureDevOpsService {
     initialize(): void,
     ready(): Promise<void>,
-    getUserDisplayName(): string
+    getUserDisplayName(): string,
+    getAllDeliveryItens(): Promise<IDeliveryItem[]>
 }
