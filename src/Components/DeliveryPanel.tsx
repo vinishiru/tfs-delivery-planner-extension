@@ -4,9 +4,11 @@ import { Panel } from "azure-devops-ui/Panel";
 import { FormItem } from "azure-devops-ui/FormItem";
 import { TextField, TextFieldWidth } from "azure-devops-ui/TextField";
 import { Toggle } from "azure-devops-ui/Toggle";
+import { IDeliveryItem } from "../Interfaces/IDeliveryItem";
 
 interface IDeliveryPanelProps {
-    onDismiss: () => void
+    onDismiss: () => void;
+    onSave: (deliveryItem: IDeliveryItem) => void;
     deliveryId?: string;
     name?: string;
     description?: string;
@@ -18,15 +20,23 @@ interface IDeliveryPanelState {
     name?: string;
     description?: string;
     booleano?: boolean;
+
+    nameError: boolean;
+    descriptionError: boolean;
+    relatedWitError: boolean;
 }
 
 export class DeliveryPanel extends React.Component<IDeliveryPanelProps, IDeliveryPanelState> {
 
+
+
+
     constructor(props: IDeliveryPanelProps) {
         super(props);
 
-        this.state = {};
+        this.state = { nameError: false, descriptionError: false, relatedWitError: false };
         this.handleDismiss = this.handleDismiss.bind(this);
+        this.handleSave = this.handleSave.bind(this);
     }
 
     public async componentDidMount() {
@@ -47,13 +57,14 @@ export class DeliveryPanel extends React.Component<IDeliveryPanelProps, IDeliver
                         text: "Cancelar", onClick: () => { this.handleDismiss() }
                     },
                     {
-                        text: "Salvar", primary: true
+                        text: "Salvar", primary: true, onClick: () => { this.handleSave() }
                     }
                 ]}>
                 <div className="flex-column rhythm-vertical-16">
                     <FormItem
                         label={"Nome da entrega:"}
-                        message="Use an exciting spy name for identification"
+                        error={this.state.nameError}
+                        message={this.state.nameError && "Informe uma descrição."}
                     >
                         <TextField
                             value={name}
@@ -65,7 +76,8 @@ export class DeliveryPanel extends React.Component<IDeliveryPanelProps, IDeliver
 
                     <FormItem
                         label={"Descrição:"}
-                        message="Use an exciting spy name for identification"
+                        error={this.state.descriptionError}
+                        message={this.state.descriptionError && "Informe uma descrição."}
                     >
                         <TextField
                             autoAdjustHeight={true}
@@ -91,5 +103,34 @@ export class DeliveryPanel extends React.Component<IDeliveryPanelProps, IDeliver
     private handleDismiss() {
         this.props.onDismiss();
     }
+    private handleSave() {
 
+        var validationErrors = { ...this.state };
+
+        if (!this.state.name)
+            validationErrors.nameError = true;
+        else
+            validationErrors.nameError = false;
+
+        if (!this.state.description)
+            validationErrors.descriptionError = true;
+        else
+            validationErrors.descriptionError = false;
+
+
+        if (validationErrors.nameError || validationErrors.descriptionError) {
+            this.setState(validationErrors);
+            return;
+        }
+
+        var deliveryItem: IDeliveryItem;
+        deliveryItem = {
+            deliveryId: this.state.deliveryId!,
+            creationDate: new Date(),
+            name: this.state.name!,
+            description: this.state.description!,
+            relatedWits: []
+        };
+        this.props.onSave(deliveryItem);
+    }
 }

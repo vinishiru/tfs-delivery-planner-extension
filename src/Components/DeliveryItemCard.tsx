@@ -7,44 +7,10 @@ import { ArrayItemProvider } from "azure-devops-ui/Utilities/Provider";
 import { IDeliveryItem, IRelatedWit } from "../Interfaces/IDeliveryItem";
 import { Status, StatusSize, Statuses, IStatusProps } from "azure-devops-ui/Status";
 import { Link } from "azure-devops-ui/Link";
+import { DeliveryItemDeleteDialog } from "./DeliveryItemDeleteDialog";
 
-const commandBarItems: IHeaderCommandBarItem[] = [
-    {
-        id: "delete",
-        text: "Excluir",
-        onActivate: () => {
-            alert("Excluir item");
-        },
-        iconProps: {
-            iconName: "Delete"
-        }
-    },
-    {
-        id: "refresh",
-        text: "Atualizar",
-        onActivate: () => {
-            alert("Atualizar item");
-        },
-        iconProps: {
-            iconName: "Refresh"
-        }
-    },
-    {
-        important: true,
-        id: "edit",
-        text: "Editar",
-        onActivate: () => {
-            alert("Editar item");
-        },
-        iconProps: {
-            iconName: "Edit"
-        },
-        isPrimary: true,
-        tooltipProps: {
-            text: "Edite os itens da entrega."
-        }
-    }
-];
+const Fade = require('react-reveal/Fade');
+
 
 interface IRelatedWitTableItem {
     status: IStatusProps;
@@ -140,17 +106,23 @@ function renderIdColumn(
     );
 }
 
-export interface IDeliveryItemCardProps {
+interface IDeliveryItemCardProps {
     deliveryItem: IDeliveryItem
+    onDelete: (deliveryItem: IDeliveryItem) => void;
 }
 
-export class DeliveryItemCard extends React.Component<IDeliveryItemCardProps> {
+interface IDeliveryItemCardState {
+    isDeleting: boolean;
+}
+
+export class DeliveryItemCard extends React.Component<IDeliveryItemCardProps, IDeliveryItemCardState> {
 
     deliveryTableItens: ArrayItemProvider<IRelatedWitTableItem>;
 
     constructor(props: IDeliveryItemCardProps) {
         super(props);
 
+        this.state = { isDeleting: false };
         this.deliveryTableItens = new ArrayItemProvider<IRelatedWitTableItem>([]);
     }
 
@@ -163,9 +135,9 @@ export class DeliveryItemCard extends React.Component<IDeliveryItemCardProps> {
 
     getDeliveryTableItemInfo(wit: IRelatedWit): IRelatedWitTableItem {
         let tableItem: IRelatedWitTableItem;
-        
+
         tableItem = {
-            status: Statuses.Running,
+            status: Statuses.Success,
             id: wit.id,
             title: wit.name,
             effort: 10,
@@ -178,16 +150,70 @@ export class DeliveryItemCard extends React.Component<IDeliveryItemCardProps> {
 
     public render(): JSX.Element {
         return (
-            <Card
-                className="bolt-table-card"
-                titleProps={{ text: this.props.deliveryItem.name }}
-                headerCommandBarItems={commandBarItems}
-            >
-                <Table<Partial<IRelatedWitTableItem>>
-                    columns={sizableColumns}
-                    itemProvider={this.deliveryTableItens}
-                />
-            </Card>
+            <div>
+                <Fade left distance={"5%"}>
+                    <Card
+                        className="bolt-table-card"
+                        titleProps={{ text: this.props.deliveryItem.name }}
+                        headerCommandBarItems={this.commandBarItems(this.props.deliveryItem)}
+                    >
+                        <Table<Partial<IRelatedWitTableItem>>
+                            columns={sizableColumns}
+                            itemProvider={this.deliveryTableItens}
+                        />
+                    </Card>
+                </Fade>
+
+                {this.state.isDeleting &&
+                    (<DeliveryItemDeleteDialog
+                        deliveryItem={this.props.deliveryItem}
+                        onDismiss={() => this.setState({ isDeleting: false })}
+                        onDelete={() => {
+                            this.props.onDelete(this.props.deliveryItem);
+                            this.setState({isDeleting: false});
+                        }} />
+                    )}
+            </div>
         );
+    }
+
+    private commandBarItems(deliveryItem: IDeliveryItem): IHeaderCommandBarItem[] {
+        return [
+            {
+                id: "delete",
+                text: "Excluir",
+                onActivate: () => {
+                    this.setState({ isDeleting: true });
+                },
+                iconProps: {
+                    iconName: "Delete"
+                }
+            },
+            {
+                id: "refresh",
+                text: "Atualizar",
+                onActivate: (e, i) => {
+                    alert("Atualizar item " + deliveryItem.deliveryId);
+                },
+                iconProps: {
+                    iconName: "Refresh"
+                }
+            },
+            {
+                important: true,
+                id: "edit",
+                text: "Editar",
+                onActivate: () => {
+                    alert("Editar item " + deliveryItem.deliveryId);
+                },
+                iconProps: {
+                    iconName: "Edit"
+                },
+                isPrimary: true,
+                tooltipProps: {
+                    text: "Edite os itens da entrega."
+                }
+            }
+        ];
     }
 }

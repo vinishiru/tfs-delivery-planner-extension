@@ -5,12 +5,12 @@ import { IHeaderCommandBarItem } from "azure-devops-ui/HeaderCommandBar";
 import { Page } from "azure-devops-ui/Page";
 import { Tab, TabBar, TabSize } from "azure-devops-ui/Tabs";
 import { ZeroData, ZeroDataActionType } from "azure-devops-ui/ZeroData";
+
+
 import { IAzureDevOpsService } from "./Interfaces/IAzureDevOpsService";
 import { MoqAzureDevOpsService } from "./Services/MoqAzureDevOpsService";
-
 import { DeliveryPanel } from "./Components/DeliveryPanel";
 import { DeliveryItemCard } from "./Components/DeliveryItemCard";
-
 import { showRootComponent } from "./Common"
 import { IDeliveryItem } from "./Interfaces/IDeliveryItem";
 
@@ -32,6 +32,9 @@ class DeliveryPlanner extends React.Component<{}, IDeliveryPlannerState> {
         this.allDeliveryItens = [];
         this.createNewDelivery = this.createNewDelivery.bind(this);
         this.handleDeliveryPanelDismiss = this.handleDeliveryPanelDismiss.bind(this);
+        this.handleDeliveryPanelSave = this.handleDeliveryPanelSave.bind(this);
+        this.handleDeliveryItemDelete = this.handleDeliveryItemDelete.bind(this);
+
     }
 
     public async componentDidMount() {
@@ -44,7 +47,7 @@ class DeliveryPlanner extends React.Component<{}, IDeliveryPlannerState> {
 
     public render(): JSX.Element {
         const items = this.allDeliveryItens.map(item =>
-            <DeliveryItemCard deliveryItem={item} />
+            <DeliveryItemCard key={item.deliveryId} deliveryItem={item} onDelete={this.handleDeliveryItemDelete} />
         );
         return (
             <Page className="flex-grow rhythm-vertical-16">
@@ -62,19 +65,29 @@ class DeliveryPlanner extends React.Component<{}, IDeliveryPlannerState> {
                 </TabBar>
 
                 {this.state.creatingNewDelivery && (
-                    <DeliveryPanel onDismiss={this.handleDeliveryPanelDismiss} />
+                    <DeliveryPanel onDismiss={this.handleDeliveryPanelDismiss} onSave={this.handleDeliveryPanelSave} />
                 )}
+                {this.hasItems() &&
+                    <div className="flex-column flex-center padding-16 rhythm-vertical-16">
+                        {items}
+                    </div>
+                }
 
-                <div className="flex-column flex-center padding-16 rhythm-vertical-16">
-                    {items}
-                </div>
-                {/* 
-                {this.getPageContent()} */}
+                {!this.hasItems() &&
+                    this.renderZeroData()
+                }
+
+
+
             </Page >
         );
     }
 
-    public getPageContent() {
+    private hasItems(): boolean {
+        return this.allDeliveryItens.length !== 0;
+    }
+
+    private renderZeroData(): JSX.Element {
         return (
             <div>
                 <ZeroData
@@ -120,6 +133,17 @@ class DeliveryPlanner extends React.Component<{}, IDeliveryPlannerState> {
 
     private handleDeliveryPanelDismiss() {
         this.setState({ creatingNewDelivery: false });
+    }
+
+    private handleDeliveryPanelSave(deliveryItem: IDeliveryItem) {
+        this.sdkService.saveDeliveryItem(deliveryItem);
+        this.setState({ creatingNewDelivery: false });
+    }
+
+    private async handleDeliveryItemDelete(deliveryItem: IDeliveryItem) {
+        this.sdkService.deleteDeliveryItem(deliveryItem);
+        this.allDeliveryItens = await this.sdkService.getAllDeliveryItens();
+        this.setState({});
     }
 
 }

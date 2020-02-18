@@ -2,6 +2,7 @@ export interface IDeliveryItem {
     deliveryId: string,
     name: string,
     description: string,
+    creationDate: Date,
     relatedWits: IRelatedWit[]
 }
 
