@@ -4,6 +4,7 @@ import { Dialog } from "azure-devops-ui/Dialog";
 
 import { IDeliveryItem } from "../Interfaces/IDeliveryItem";
 
+
 interface IDeliveryItemDeleteDialogProps {
     deliveryItem: IDeliveryItem;
     onDismiss: () => void;
@@ -13,6 +14,7 @@ interface IDeliveryItemDeleteDialogProps {
 export class DeliveryItemDeleteDialog extends React.Component<IDeliveryItemDeleteDialogProps> {
     public render(): JSX.Element {
         return (
+
             <Dialog
                 titleProps={{ text: "Confirmar Exclusão" }}
                 footerButtonProps={[
@@ -27,9 +29,8 @@ export class DeliveryItemDeleteDialog extends React.Component<IDeliveryItemDelet
                     }
                 ]}
                 onDismiss={this.props.onDismiss}
-            >
-                Tem certeza que deseja excluir a entrega '{this.props.deliveryItem.name}'?
-                    </Dialog>
+            >Tem certeza que deseja excluir a entrega '{this.props.deliveryItem.name}'?
+            </Dialog>
         );
     }
 

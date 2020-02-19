@@ -4,6 +4,7 @@ import { Panel } from "azure-devops-ui/Panel";
 import { FormItem } from "azure-devops-ui/FormItem";
 import { TextField, TextFieldWidth } from "azure-devops-ui/TextField";
 import { Toggle } from "azure-devops-ui/Toggle";
+
 import { IDeliveryItem } from "../Interfaces/IDeliveryItem";
 
 interface IDeliveryPanelProps {
@@ -27,9 +28,6 @@ interface IDeliveryPanelState {
 }
 
 export class DeliveryPanel extends React.Component<IDeliveryPanelProps, IDeliveryPanelState> {
-
-
-
 
     constructor(props: IDeliveryPanelProps) {
         super(props);

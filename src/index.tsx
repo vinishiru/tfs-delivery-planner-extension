@@ -101,7 +101,7 @@ class DeliveryPlanner extends React.Component<{}, IDeliveryPlannerState> {
                         </div>
                     }
                     imageAltText="Delivery Planner"
-                    imagePath="../static/checklist.png"
+                    imagePath={require("./static/checklist.png")}
                     actionText="Criar Entrega"
                     actionType={ZeroDataActionType.ctaButton}
                     onActionClick={this.createNewDelivery}

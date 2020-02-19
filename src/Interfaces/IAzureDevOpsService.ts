@@ -1,4 +1,5 @@
 import { IDeliveryItem } from "./IDeliveryItem";
+import { IRelatedWitTableItem } from "../Components/DeliveryItemCard";
 
 export interface IAzureDevOpsService {
     initialize(): void,
@@ -7,4 +8,5 @@ export interface IAzureDevOpsService {
     getAllDeliveryItens(): Promise<IDeliveryItem[]>,
     saveDeliveryItem(deliveryItem: IDeliveryItem): void
     deleteDeliveryItem(deliveryItem: IDeliveryItem): void
+    getWitDetails(witId: number): IRelatedWitTableItem
 }
