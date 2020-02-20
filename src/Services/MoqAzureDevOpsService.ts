@@ -34,7 +34,7 @@ export class MoqAzureDevOpsService implements IAzureDevOpsService {
     }
 
     async getAllDeliveryItens(): Promise<IDeliveryItem[]> {
-        //return this._deliveryItens;
+        // return this._deliveryItens;
         return [
             {
                 deliveryId: "asdf",

@@ -7,6 +7,7 @@ import { ArrayItemProvider } from "azure-devops-ui/Utilities/Provider";
 import { Status, StatusSize, IStatusProps } from "azure-devops-ui/Status";
 import { Link } from "azure-devops-ui/Link";
 import Skeleton from 'react-loading-skeleton';
+import ProgressBar from 'react-bootstrap/ProgressBar'
 
 import { IDeliveryItem, IRelatedWit } from "../Interfaces/IDeliveryItem";
 import { DeliveryItemDeleteDialog } from "./DeliveryItemDeleteDialog";
@@ -79,7 +80,7 @@ sizableColumns = [
         name: "Progresso",
         maxWidth: 300,
         width: new ObservableValue(300),
-        renderCell: renderSimpleCell,
+        renderCell: renderProgressColumn,
         onSize: onSizeSizable
     }
 ];
@@ -109,6 +110,32 @@ function renderIdColumn(
                     {tableItem.id}
                 </Link>
             </div>
+        </SimpleTableCell>
+    );
+}
+
+function renderProgressColumn(
+    rowIndex: number,
+    columnIndex: number,
+    tableColumn: ITableColumn<IRelatedWitTableItem>,
+    tableItem: IRelatedWitTableItem
+): JSX.Element {
+
+    var totalTasks = tableItem.todoTasksCount + tableItem.inProgressTaskCount + tableItem.doneTaskCount;
+    var porcentagemDone = tableItem.doneTaskCount / totalTasks * 100;
+    var porcentagemInProgress = tableItem.inProgressTaskCount / totalTasks * 100;
+
+    return (
+        <SimpleTableCell
+            columnIndex={columnIndex}
+            tableColumn={tableColumn}
+            key={"col-" + columnIndex}
+            contentClassName="fontWeightSemiBold font-weight-semibold fontSizeM font-size-m scroll-hidden"
+        >
+            <ProgressBar className={"flex-grow"}>
+                <ProgressBar variant="success" now={porcentagemDone} key={1} />
+                <ProgressBar animated now={porcentagemInProgress} key={2} />
+            </ProgressBar>
         </SimpleTableCell>
     );
 }
