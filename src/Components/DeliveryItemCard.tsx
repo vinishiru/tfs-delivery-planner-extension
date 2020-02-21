@@ -1,7 +1,7 @@
 import * as React from "react";
 import { Card } from "azure-devops-ui/Card";
 import { IHeaderCommandBarItem } from "azure-devops-ui/HeaderCommandBar";
-import { SimpleTableCell, renderSimpleCell, Table, ITableColumn } from "azure-devops-ui/Table";
+import { SimpleTableCell, renderSimpleCell, Table, ITableColumn, ColumnFill } from "azure-devops-ui/Table";
 import { ObservableValue } from "azure-devops-ui/Core/Observable";
 import { ArrayItemProvider } from "azure-devops-ui/Utilities/Provider";
 import { Status, StatusSize, IStatusProps } from "azure-devops-ui/Status";
@@ -38,48 +38,46 @@ sizableColumns = [
     {
         id: "id",
         name: "ID",
-        minWidth: 15,
-        width: new ObservableValue(100),
+        width: new ObservableValue(-5),
         renderCell: renderIdColumn,
         onSize: onSizeSizable
     },
     {
         id: "title",
         name: "Título",
-        maxWidth: 300,
-        width: new ObservableValue(200),
+        width: new ObservableValue(-35),
         renderCell: renderSimpleCell,
         onSize: onSizeSizable
     },
     {
         id: "effort",
         name: "Pontos",
-        maxWidth: 100,
-        width: new ObservableValue(100),
+        // maxWidth: 100,
+        width: new ObservableValue(-5),
         renderCell: renderSimpleCell,
         onSize: onSizeSizable
     },
     {
         id: "column",
         name: "Coluna",
-        maxWidth: 300,
-        width: new ObservableValue(200),
+        // maxWidth: 300,
+        width: new ObservableValue(-20),
         renderCell: renderSimpleCell,
         onSize: onSizeSizable
     },
     {
         id: "totalTaskWork",
-        name: "Total de Horas",
-        maxWidth: 150,
-        width: new ObservableValue(150),
+        name: "Horas Realizadas/Planejadas",
+        // maxWidth: 180,
+        width: new ObservableValue(-15),
         renderCell: renderSimpleCell,
         onSize: onSizeSizable
     },
     {
         id: "progress",
         name: "Progresso",
-        maxWidth: 300,
-        width: new ObservableValue(300),
+        // maxWidth: 300,
+        width: new ObservableValue(-20),
         renderCell: renderProgressColumn,
         onSize: onSizeSizable
     }
@@ -170,7 +168,7 @@ export class DeliveryItemCard extends React.Component<IDeliveryItemCardProps, ID
             <div>
                 <Fade left distance={"5%"}>
                     <Card
-                        className="bolt-table-card"
+                        className="flex-grow bolt-table-card"
                         titleProps={{ text: this.props.deliveryItem.name }}
                         headerCommandBarItems={this.commandBarItems(this.props.deliveryItem)}
                     >
@@ -186,10 +184,8 @@ export class DeliveryItemCard extends React.Component<IDeliveryItemCardProps, ID
 
                         {!this.state.relatedWitLoaded &&
                             (
-                                <div className={"flex-column flex-grow"} >
-                                    <div className={"flex-center"}>
-                                        <Skeleton count={this.props.deliveryItem.relatedWits.length} />
-                                    </div>
+                                <div className={"flex-grow padding-16"} >
+                                    <Skeleton count={this.props.deliveryItem.relatedWits.length + 1} />
                                 </div>
                             )}
                     </Card>

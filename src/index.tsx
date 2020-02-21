@@ -68,7 +68,7 @@ class DeliveryPlanner extends React.Component<{}, IDeliveryPlannerState> {
                     <DeliveryPanel onDismiss={this.handleDeliveryPanelDismiss} onSave={this.handleDeliveryPanelSave} />
                 )}
                 {this.hasItems() &&
-                    <div className="flex-column flex-center padding-16 rhythm-vertical-16">
+                    <div className="padding-16 rhythm-vertical-16">
                         {items}
                     </div>
                 }
