@@ -1,4 +1,4 @@
-import { IDeliveryItem } from "./IDeliveryItem";
+import { IDeliveryItem, IRelatedWit } from "./IDeliveryItem";
 import { IRelatedWitTableItem } from "../Components/DeliveryItemCard";
 
 export interface IAzureDevOpsService {
@@ -9,4 +9,5 @@ export interface IAzureDevOpsService {
     saveDeliveryItem(deliveryItem: IDeliveryItem): void
     deleteDeliveryItem(deliveryItem: IDeliveryItem): void
     getWitDetails(witId: number): IRelatedWitTableItem
+    getWit(witId: number): IRelatedWit
 }

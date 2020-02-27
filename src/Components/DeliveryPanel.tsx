@@ -3,9 +3,9 @@ import * as React from "react";
 import { Panel } from "azure-devops-ui/Panel";
 import { FormItem } from "azure-devops-ui/FormItem";
 import { TextField, TextFieldWidth } from "azure-devops-ui/TextField";
-import { Toggle } from "azure-devops-ui/Toggle";
 
 import { IDeliveryItem } from "../Interfaces/IDeliveryItem";
+import { WorkItemPicker } from "./WorkItemPicker";
 
 interface IDeliveryPanelProps {
     onDismiss: () => void;
@@ -20,7 +20,6 @@ interface IDeliveryPanelState {
     deliveryId?: string;
     name?: string;
     description?: string;
-    booleano?: boolean;
 
     nameError: boolean;
     descriptionError: boolean;
@@ -37,13 +36,9 @@ export class DeliveryPanel extends React.Component<IDeliveryPanelProps, IDeliver
         this.handleSave = this.handleSave.bind(this);
     }
 
-    public async componentDidMount() {
-
-    }
-
     public render(): JSX.Element {
 
-        const { name, description, booleano } = this.state;
+        const { name, description } = this.state;
 
         return (
             <Panel
@@ -86,13 +81,13 @@ export class DeliveryPanel extends React.Component<IDeliveryPanelProps, IDeliver
                             width={TextFieldWidth.standard}
                         />
                     </FormItem>
+                    <FormItem
+                        label={"Work Itens:"}
+                        error={this.state.descriptionError}
+                        message={this.state.descriptionError && "Informe uma descrição."}>
+                        <WorkItemPicker />
+                    </FormItem>
 
-                    <Toggle
-                        offText={"Não"}
-                        onText={"Sim"}
-                        checked={booleano}
-                        onChange={(e, value) => this.setState({ booleano: value })}
-                    />
                 </div>
             </Panel>
         );

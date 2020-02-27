@@ -8,5 +8,5 @@ export interface IDeliveryItem {
 
 export interface IRelatedWit {
     id: number,
-    name: string
+    title: string
 }

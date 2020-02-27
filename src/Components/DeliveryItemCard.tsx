@@ -1,7 +1,7 @@
 import * as React from "react";
 import { Card } from "azure-devops-ui/Card";
 import { IHeaderCommandBarItem } from "azure-devops-ui/HeaderCommandBar";
-import { SimpleTableCell, renderSimpleCell, Table, ITableColumn, ColumnFill } from "azure-devops-ui/Table";
+import { SimpleTableCell, renderSimpleCell, Table, ITableColumn } from "azure-devops-ui/Table";
 import { ObservableValue } from "azure-devops-ui/Core/Observable";
 import { ArrayItemProvider } from "azure-devops-ui/Utilities/Provider";
 import { Status, StatusSize, IStatusProps } from "azure-devops-ui/Status";
