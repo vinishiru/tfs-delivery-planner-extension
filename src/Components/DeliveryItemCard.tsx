@@ -139,8 +139,11 @@ function renderProgressColumn(
 }
 
 interface IDeliveryItemCardProps {
-    deliveryItem: IDeliveryItem
+    deliveryItem: IDeliveryItem;
     onDelete: (deliveryItem: IDeliveryItem) => void;
+    onEdit: (id: string) => void;
+
+    isEditing?: ObservableValue<boolean>;
 }
 
 interface IDeliveryItemCardState {
@@ -243,7 +246,7 @@ export class DeliveryItemCard extends React.Component<IDeliveryItemCardProps, ID
                 id: "edit",
                 text: "Editar",
                 onActivate: () => {
-                    alert("Editar item " + deliveryItem.deliveryId);
+                    this.props.onEdit(deliveryItem.deliveryId);
                 },
                 iconProps: {
                     iconName: "Edit"

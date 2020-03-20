@@ -6,14 +6,12 @@ import { TextField, TextFieldWidth } from "azure-devops-ui/TextField";
 
 import { IDeliveryItem } from "../Interfaces/IDeliveryItem";
 import { WorkItemPicker } from "./WorkItemPicker";
+import SdkService from "..";
 
 interface IDeliveryPanelProps {
     onDismiss: () => void;
     onSave: (deliveryItem: IDeliveryItem) => void;
     deliveryId?: string;
-    name?: string;
-    description?: string;
-    booleano?: boolean;
 }
 
 interface IDeliveryPanelState {
@@ -34,6 +32,17 @@ export class DeliveryPanel extends React.Component<IDeliveryPanelProps, IDeliver
         this.state = { nameError: false, descriptionError: false, relatedWitError: false };
         this.handleDismiss = this.handleDismiss.bind(this);
         this.handleSave = this.handleSave.bind(this);
+    }
+
+    public async componentDidMount() {
+
+        if (!this.props.deliveryId)
+            return;
+
+        var deliveryItem = await SdkService.getDeliveryItem(this.props.deliveryId!);
+
+        if (deliveryItem)
+            this.setState({ name: deliveryItem.name, description: deliveryItem.description });
     }
 
     public render(): JSX.Element {
@@ -85,7 +94,7 @@ export class DeliveryPanel extends React.Component<IDeliveryPanelProps, IDeliver
                         label={"Work Itens:"}
                         error={this.state.descriptionError}
                         message={this.state.descriptionError && "Informe uma descrição."}>
-                        <WorkItemPicker />
+                        <WorkItemPicker relatedWits={[]} />
                     </FormItem>
 
                 </div>

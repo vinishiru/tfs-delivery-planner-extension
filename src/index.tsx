@@ -16,7 +16,8 @@ import { IDeliveryItem } from "./Interfaces/IDeliveryItem";
 
 export interface IDeliveryPlannerState {
     userDisplayName?: string;
-    creatingNewDelivery: boolean
+    creatingOrEditingDelivery: boolean;
+    editingDeliveryId?: string;
 }
 
 class DeliveryPlanner extends React.Component<{}, IDeliveryPlannerState> {
@@ -28,12 +29,13 @@ class DeliveryPlanner extends React.Component<{}, IDeliveryPlannerState> {
         super(props);
 
         this.sdkService = SdkService;
-        this.state = { creatingNewDelivery: false };
+        this.state = { creatingOrEditingDelivery: false };
         this.allDeliveryItens = [];
         this.createNewDelivery = this.createNewDelivery.bind(this);
         this.handleDeliveryPanelDismiss = this.handleDeliveryPanelDismiss.bind(this);
         this.handleDeliveryPanelSave = this.handleDeliveryPanelSave.bind(this);
         this.handleDeliveryItemDelete = this.handleDeliveryItemDelete.bind(this);
+        this.handleDeliveryItemEdit = this.handleDeliveryItemEdit.bind(this);
 
     }
 
@@ -47,7 +49,7 @@ class DeliveryPlanner extends React.Component<{}, IDeliveryPlannerState> {
 
     public render(): JSX.Element {
         const items = this.allDeliveryItens.map(item =>
-            <DeliveryItemCard key={item.deliveryId} deliveryItem={item} onDelete={this.handleDeliveryItemDelete} />
+            <DeliveryItemCard key={item.deliveryId} deliveryItem={item} onDelete={this.handleDeliveryItemDelete} onEdit={this.handleDeliveryItemEdit} />
         );
         return (
             <Page className="flex-grow rhythm-vertical-16">
@@ -64,8 +66,8 @@ class DeliveryPlanner extends React.Component<{}, IDeliveryPlannerState> {
                     <Tab name="Entregas Planejadas" id="entregasPlanejadas" />
                 </TabBar>
 
-                {this.state.creatingNewDelivery && (
-                    <DeliveryPanel onDismiss={this.handleDeliveryPanelDismiss} onSave={this.handleDeliveryPanelSave} />
+                {(this.state.creatingOrEditingDelivery) && (
+                    <DeliveryPanel deliveryId={this.state.editingDeliveryId} onDismiss={this.handleDeliveryPanelDismiss} onSave={this.handleDeliveryPanelSave} />
                 )}
                 {this.hasItems() &&
                     <div className="padding-16 rhythm-vertical-16">
@@ -128,22 +130,26 @@ class DeliveryPlanner extends React.Component<{}, IDeliveryPlannerState> {
     }
 
     private createNewDelivery() {
-        this.setState({ creatingNewDelivery: true });
+        this.setState({ creatingOrEditingDelivery: true, editingDeliveryId: undefined });
     }
 
     private handleDeliveryPanelDismiss() {
-        this.setState({ creatingNewDelivery: false });
+        this.setState({ creatingOrEditingDelivery: false, editingDeliveryId: undefined });
     }
 
     private handleDeliveryPanelSave(deliveryItem: IDeliveryItem) {
         this.sdkService.saveDeliveryItem(deliveryItem);
-        this.setState({ creatingNewDelivery: false });
+        this.setState({ creatingOrEditingDelivery: false, editingDeliveryId: undefined });
     }
 
     private async handleDeliveryItemDelete(deliveryItem: IDeliveryItem) {
         this.sdkService.deleteDeliveryItem(deliveryItem);
         this.allDeliveryItens = await this.sdkService.getAllDeliveryItens();
         this.setState({});
+    }
+
+    private handleDeliveryItemEdit(id: string) {
+        this.setState({ creatingOrEditingDelivery: true, editingDeliveryId: id });
     }
 
 }

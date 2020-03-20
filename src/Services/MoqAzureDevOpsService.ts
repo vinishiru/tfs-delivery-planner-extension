@@ -5,7 +5,35 @@ import { IDeliveryItem, IRelatedWit } from "../Interfaces/IDeliveryItem"
 import { IRelatedWitTableItem } from "../Components/DeliveryItemCard";
 
 export class MoqAzureDevOpsService implements IAzureDevOpsService {
+    
     _deliveryItens: IDeliveryItem[] = [];
+
+    _allDeliveryItemsMock: IDeliveryItem[] = [
+        {
+            deliveryId: "123456",
+            name: "Projeto A",
+            creationDate: new Date(),
+            description: "Entrega do Projeto A",
+            relatedWits: [
+                {
+                    id: 1,
+                    title: "PBI A"
+                },
+                {
+                    id: 2,
+                    title: "PBI XPTO"
+                }
+            ]
+        },
+        {
+            deliveryId: "789456",
+            name: "Projeto B",
+            creationDate: new Date(),
+            description: "Entrega do Projeto B",
+            relatedWits: [{ id: 2, title: "PBI B" }]
+        }
+    ];
+
     _witData: IRelatedWit[] = [
         {
             id: 40123,
@@ -20,6 +48,10 @@ export class MoqAzureDevOpsService implements IAzureDevOpsService {
             title: "Atualizar teletransportador para versão Zeta"
         }
     ];
+
+    async getDeliveryItem(id: string): Promise<IDeliveryItem> {
+        return await this._allDeliveryItemsMock[0];
+    }
 
     deleteDeliveryItem(deliveryItem: IDeliveryItem): void {
         this._deliveryItens = this._deliveryItens.filter(item => item.deliveryId !== deliveryItem.deliveryId);
@@ -44,31 +76,7 @@ export class MoqAzureDevOpsService implements IAzureDevOpsService {
 
     async getAllDeliveryItens(): Promise<IDeliveryItem[]> {
         // return this._deliveryItens;
-        return [
-            {
-                deliveryId: "asdf",
-                name: "Projeto A",
-                creationDate: new Date(),
-                description: "Entrega do Projeto A",
-                relatedWits: [
-                    {
-                        id: 1,
-                        title: "PBI A"
-                    },
-                    {
-                        id: 2,
-                        title: "PBI XPTO"
-                    }
-                ]
-            },
-            {
-                deliveryId: "qwer",
-                name: "Projeto B",
-                creationDate: new Date(),
-                description: "Entrega do Projeto B",
-                relatedWits: [{ id: 2, title: "PBI B" }]
-            }
-        ];
+        return this._allDeliveryItemsMock;
     }
 
     getWitDetails(witId: number): IRelatedWitTableItem {

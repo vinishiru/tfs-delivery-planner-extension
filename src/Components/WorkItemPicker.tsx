@@ -6,7 +6,11 @@ import SdkService from "..";
 import { IRelatedWit } from "../Interfaces/IDeliveryItem";
 
 
-export const WorkItemPicker: React.FunctionComponent<{}> = () => {
+interface IWorkItemPickerProps {
+    relatedWits: IRelatedWit[]
+}
+
+export const WorkItemPicker: React.FunctionComponent<IWorkItemPickerProps> = (props: IWorkItemPickerProps) => {
     const [tagItems, setTagItems] = useObservableArray<IRelatedWit>([]);
     const [suggestions, setSuggestions] = useObservableArray<IRelatedWit>([]);
 
@@ -16,24 +20,18 @@ export const WorkItemPicker: React.FunctionComponent<{}> = () => {
 
     const convertItemToPill = (tag: IRelatedWit) => {
         return {
-            content: `${tag.id}-${tag.title}`,
-            onClick: () => alert(`Clicked tag "${tag.title}"`)
+            content: `${tag.id}-${tag.title}`
+            //onClick: () => alert(`Clicked tag "${tag.title}"`)
         };
     };
 
     const onSearchChanged = (searchValue: string) => {
 
         var witFound = SdkService.getWit(+searchValue);
-        setSuggestions(
-            [witFound]
-                .filter(
-                    // Items not already included
-                    testItem =>
-                        tagItems.value.findIndex(
-                            testSuggestion => testSuggestion.id === testItem.id
-                        ) === -1
-                )
-        );
+        if (witFound)
+            setSuggestions([witFound]);
+        else
+            setSuggestions([]);
     };
 
     const onTagAdded = (tag: IRelatedWit) => {
@@ -46,7 +44,7 @@ export const WorkItemPicker: React.FunctionComponent<{}> = () => {
 
     const renderSuggestionItem = (tag: ISuggestionItemProps<IRelatedWit>) => {
         if (tag.item)
-            return <div className="body-m">{tag.item.title}</div>;
+            return <div className="body-m">{tag.item.id}-{tag.item.title}</div>;
         return <div />;
     };
 

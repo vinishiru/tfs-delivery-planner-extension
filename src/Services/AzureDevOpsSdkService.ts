@@ -2,6 +2,12 @@ import * as SDK from 'azure-devops-extension-sdk'
 import { IAzureDevOpsService } from "../Interfaces/IAzureDevOpsService"
 
 export class AzureDevOpsSdkService implements IAzureDevOpsService {
+    getDeliveryItem(): Promise<import("../Interfaces/IDeliveryItem").IDeliveryItem> {
+        throw new Error("Method not implemented.");
+    }
+    getWit(witId: number): import("../Interfaces/IDeliveryItem").IRelatedWit {
+        throw new Error("Method not implemented.");
+    }
     getWitDetails(witId: number): import("../Components/DeliveryItemCard").IRelatedWitTableItem {
         throw new Error("Method not implemented.");
     }
