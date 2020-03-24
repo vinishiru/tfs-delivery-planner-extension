@@ -5,7 +5,7 @@ import { IDeliveryItem, IRelatedWit } from "../Interfaces/IDeliveryItem"
 import { IRelatedWitTableItem } from "../Components/DeliveryItemCard";
 
 export class MoqAzureDevOpsService implements IAzureDevOpsService {
-    
+
     _deliveryItens: IDeliveryItem[] = [];
 
     _allDeliveryItemsMock: IDeliveryItem[] = [
@@ -49,8 +49,9 @@ export class MoqAzureDevOpsService implements IAzureDevOpsService {
         }
     ];
 
-    async getDeliveryItem(id: string): Promise<IDeliveryItem> {
-        return await this._allDeliveryItemsMock[0];
+    async getDeliveryItem(id: string): Promise<IDeliveryItem | undefined> {
+        return await Promise.resolve(this._deliveryItens.find(x => x.deliveryId === id));
+        // return await this._allDeliveryItemsMock[0];
     }
 
     deleteDeliveryItem(deliveryItem: IDeliveryItem): void {
@@ -59,9 +60,10 @@ export class MoqAzureDevOpsService implements IAzureDevOpsService {
 
     saveDeliveryItem(deliveryItem: IDeliveryItem): void {
         deliveryItem.deliveryId = Math.random().toString();
-        deliveryItem.relatedWits = [{ id: 1, title: "WIT A" }, { id: 2, title: "WIT B" }, { id: 2, title: "WIT C" }]
+        //deliveryItem.relatedWits = [{ id: 1, title: "WIT A" }, { id: 2, title: "WIT B" }, { id: 2, title: "WIT C" }]
         this._deliveryItens.push(deliveryItem);
     }
+
     initialize(): void {
         //faz nada
     }
@@ -75,15 +77,16 @@ export class MoqAzureDevOpsService implements IAzureDevOpsService {
     }
 
     async getAllDeliveryItens(): Promise<IDeliveryItem[]> {
-        // return this._deliveryItens;
-        return this._allDeliveryItemsMock;
+        return this._deliveryItens;
+        //return this._allDeliveryItemsMock;
     }
 
     getWitDetails(witId: number): IRelatedWitTableItem {
+        const wit = this.getWit(witId);
         return {
             status: Statuses.Success,
-            id: witId,
-            title: "Wit Id X",
+            id: wit.id,
+            title: wit.title,
             effort: 10,
             column: "Dev Done",
             totalTaskWork: "10/80",

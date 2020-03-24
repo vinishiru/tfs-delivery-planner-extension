@@ -7,12 +7,17 @@ import { IRelatedWit } from "../Interfaces/IDeliveryItem";
 
 
 interface IWorkItemPickerProps {
-    relatedWits: IRelatedWit[]
+    relatedWits: IRelatedWit[];
+    updateRelatedWits: (relatedWits: IRelatedWit[]) => void;
 }
 
 export const WorkItemPicker: React.FunctionComponent<IWorkItemPickerProps> = (props: IWorkItemPickerProps) => {
-    const [tagItems, setTagItems] = useObservableArray<IRelatedWit>([]);
+    const [tagItems, setTagItems] = useObservableArray<IRelatedWit>(props.relatedWits);
     const [suggestions, setSuggestions] = useObservableArray<IRelatedWit>([]);
+
+    React.useEffect(() => {
+        setTagItems(props.relatedWits);
+    });
 
     const areTagsEqual = (a: IRelatedWit, b: IRelatedWit) => {
         return a.id === b.id;
@@ -36,10 +41,12 @@ export const WorkItemPicker: React.FunctionComponent<IWorkItemPickerProps> = (pr
 
     const onTagAdded = (tag: IRelatedWit) => {
         setTagItems([...tagItems.value, tag]);
+        props.updateRelatedWits(tagItems.value);
     };
 
     const onTagRemoved = (tag: IRelatedWit) => {
         setTagItems(tagItems.value.filter(x => x.id !== tag.id));
+        props.updateRelatedWits(tagItems.value);
     };
 
     const renderSuggestionItem = (tag: ISuggestionItemProps<IRelatedWit>) => {

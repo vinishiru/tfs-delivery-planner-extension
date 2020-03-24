@@ -4,7 +4,7 @@ import { Panel } from "azure-devops-ui/Panel";
 import { FormItem } from "azure-devops-ui/FormItem";
 import { TextField, TextFieldWidth } from "azure-devops-ui/TextField";
 
-import { IDeliveryItem } from "../Interfaces/IDeliveryItem";
+import { IDeliveryItem, IRelatedWit } from "../Interfaces/IDeliveryItem";
 import { WorkItemPicker } from "./WorkItemPicker";
 import SdkService from "..";
 
@@ -18,6 +18,7 @@ interface IDeliveryPanelState {
     deliveryId?: string;
     name?: string;
     description?: string;
+    relatedWits?: IRelatedWit[];
 
     nameError: boolean;
     descriptionError: boolean;
@@ -30,6 +31,8 @@ export class DeliveryPanel extends React.Component<IDeliveryPanelProps, IDeliver
         super(props);
 
         this.state = { nameError: false, descriptionError: false, relatedWitError: false };
+
+        this.handleUpdatedRelatedWits = this.handleUpdatedRelatedWits.bind(this);
         this.handleDismiss = this.handleDismiss.bind(this);
         this.handleSave = this.handleSave.bind(this);
     }
@@ -42,12 +45,12 @@ export class DeliveryPanel extends React.Component<IDeliveryPanelProps, IDeliver
         var deliveryItem = await SdkService.getDeliveryItem(this.props.deliveryId!);
 
         if (deliveryItem)
-            this.setState({ name: deliveryItem.name, description: deliveryItem.description });
+            this.setState({ name: deliveryItem.name, description: deliveryItem.description, relatedWits: deliveryItem.relatedWits });
     }
 
     public render(): JSX.Element {
 
-        const { name, description } = this.state;
+        const { name, description, relatedWits } = this.state;
 
         return (
             <Panel
@@ -94,12 +97,16 @@ export class DeliveryPanel extends React.Component<IDeliveryPanelProps, IDeliver
                         label={"Work Itens:"}
                         error={this.state.descriptionError}
                         message={this.state.descriptionError && "Informe uma descrição."}>
-                        <WorkItemPicker relatedWits={[]} />
+                        <WorkItemPicker relatedWits={relatedWits || []} updateRelatedWits={this.handleUpdatedRelatedWits} />
                     </FormItem>
 
                 </div>
             </Panel>
         );
+    }
+
+    private handleUpdatedRelatedWits(relatedWits: IRelatedWit[]) {
+        this.setState({ relatedWits: relatedWits });
     }
 
     private handleDismiss() {
@@ -131,7 +138,7 @@ export class DeliveryPanel extends React.Component<IDeliveryPanelProps, IDeliver
             creationDate: new Date(),
             name: this.state.name!,
             description: this.state.description!,
-            relatedWits: []
+            relatedWits: this.state.relatedWits!
         };
         this.props.onSave(deliveryItem);
     }
