@@ -59,8 +59,12 @@ export class MoqAzureDevOpsService implements IAzureDevOpsService {
     }
 
     saveDeliveryItem(deliveryItem: IDeliveryItem): void {
-        deliveryItem.deliveryId = Math.random().toString();
-        //deliveryItem.relatedWits = [{ id: 1, title: "WIT A" }, { id: 2, title: "WIT B" }, { id: 2, title: "WIT C" }]
+
+        if (deliveryItem.deliveryId)
+            this.deleteDeliveryItem(deliveryItem);
+        else
+            deliveryItem.deliveryId = Math.random().toString();
+
         this._deliveryItens.push(deliveryItem);
     }
 
@@ -77,7 +81,7 @@ export class MoqAzureDevOpsService implements IAzureDevOpsService {
     }
 
     async getAllDeliveryItens(): Promise<IDeliveryItem[]> {
-        return this._deliveryItens;
+        return this._deliveryItens.sort((a, b) => a.creationDate < b.creationDate ? -1 : 1);
         //return this._allDeliveryItemsMock;
     }
 

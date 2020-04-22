@@ -137,8 +137,9 @@ class DeliveryPlanner extends React.Component<{}, IDeliveryPlannerState> {
         this.setState({ creatingOrEditingDelivery: false, editingDeliveryId: undefined });
     }
 
-    private handleDeliveryPanelSave(deliveryItem: IDeliveryItem) {
+    private async handleDeliveryPanelSave(deliveryItem: IDeliveryItem) {
         this.sdkService.saveDeliveryItem(deliveryItem);
+        this.allDeliveryItens = await this.sdkService.getAllDeliveryItens();
         this.setState({ creatingOrEditingDelivery: false, editingDeliveryId: undefined });
     }
 

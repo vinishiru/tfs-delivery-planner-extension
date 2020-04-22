@@ -19,6 +19,7 @@ interface IDeliveryPanelState {
     name?: string;
     description?: string;
     relatedWits?: IRelatedWit[];
+    creationDate?: Date;
 
     nameError: boolean;
     descriptionError: boolean;
@@ -45,7 +46,12 @@ export class DeliveryPanel extends React.Component<IDeliveryPanelProps, IDeliver
         var deliveryItem = await SdkService.getDeliveryItem(this.props.deliveryId!);
 
         if (deliveryItem)
-            this.setState({ name: deliveryItem.name, description: deliveryItem.description, relatedWits: deliveryItem.relatedWits });
+            this.setState({
+                name: deliveryItem.name,
+                description: deliveryItem.description,
+                relatedWits: deliveryItem.relatedWits,
+                creationDate: deliveryItem.creationDate
+            });
     }
 
     public render(): JSX.Element {
@@ -134,8 +140,8 @@ export class DeliveryPanel extends React.Component<IDeliveryPanelProps, IDeliver
 
         var deliveryItem: IDeliveryItem;
         deliveryItem = {
-            deliveryId: this.state.deliveryId!,
-            creationDate: new Date(),
+            deliveryId: this.props.deliveryId!,
+            creationDate: this.state.creationDate! || new Date(),
             name: this.state.name!,
             description: this.state.description!,
             relatedWits: this.state.relatedWits!

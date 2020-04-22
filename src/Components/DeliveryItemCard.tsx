@@ -8,9 +8,11 @@ import { Status, StatusSize, IStatusProps } from "azure-devops-ui/Status";
 import { Link } from "azure-devops-ui/Link";
 import Skeleton from 'react-loading-skeleton';
 import ProgressBar from 'react-bootstrap/ProgressBar'
+import _ from "lodash";
 
-import { IDeliveryItem, IRelatedWit } from "../Interfaces/IDeliveryItem";
+import { IDeliveryItem } from "../Interfaces/IDeliveryItem";
 import { DeliveryItemDeleteDialog } from "./DeliveryItemDeleteDialog";
+
 
 import SdkService from "../index"
 
@@ -147,6 +149,7 @@ interface IDeliveryItemCardProps {
 }
 
 interface IDeliveryItemCardState {
+    deliveryItem: IDeliveryItem;
     isDeleting: boolean;
     relatedWitLoaded: boolean;
 }
@@ -158,12 +161,20 @@ export class DeliveryItemCard extends React.Component<IDeliveryItemCardProps, ID
     constructor(props: IDeliveryItemCardProps) {
         super(props);
 
-        this.state = { isDeleting: false, relatedWitLoaded: false };
+        this.state = { deliveryItem: props.deliveryItem, isDeleting: false, relatedWitLoaded: false };
         this.deliveryTableItens = new ArrayItemProvider<IRelatedWitTableItem>([]);
     }
 
     public async componentDidMount() {
-        this.loadDeliveryTableItemInfo(this.props.deliveryItem.relatedWits);
+        this.loadDeliveryTableItemInfo();
+    }
+
+    public async componentWillReceiveProps(props: IDeliveryItemCardProps) {
+        if (!_.isEqual(this.state.deliveryItem, props.deliveryItem)) {
+            this.setState({ deliveryItem: props.deliveryItem }, () => {
+                this.loadDeliveryTableItemInfo();
+            });
+        }
     }
 
     public render(): JSX.Element {
@@ -172,23 +183,21 @@ export class DeliveryItemCard extends React.Component<IDeliveryItemCardProps, ID
                 <Fade left distance={"5%"}>
                     <Card
                         className="flex-grow bolt-table-card"
-                        titleProps={{ text: this.props.deliveryItem.name }}
-                        headerCommandBarItems={this.commandBarItems(this.props.deliveryItem)}
+                        titleProps={{ text: this.state.deliveryItem.name }}
+                        headerCommandBarItems={this.commandBarItems(this.state.deliveryItem)}
                     >
                         {this.state.relatedWitLoaded &&
                             (
-                                <Fade>
-                                    <Table<Partial<IRelatedWitTableItem>>
-                                        columns={sizableColumns}
-                                        itemProvider={this.deliveryTableItens}
-                                    />
-                                </Fade>
+                                <Table<Partial<IRelatedWitTableItem>>
+                                    columns={sizableColumns}
+                                    itemProvider={this.deliveryTableItens}
+                                />
                             )}
 
                         {!this.state.relatedWitLoaded &&
                             (
                                 <div className={"flex-grow padding-16"} >
-                                    <Skeleton count={this.props.deliveryItem.relatedWits.length + 1} />
+                                    <Skeleton count={this.state.deliveryItem.relatedWits.length + 1} />
                                 </div>
                             )}
                     </Card>
@@ -197,11 +206,11 @@ export class DeliveryItemCard extends React.Component<IDeliveryItemCardProps, ID
                 {this.state.isDeleting &&
                     (
                         <DeliveryItemDeleteDialog
-                            key={this.props.deliveryItem.deliveryId}
-                            deliveryItem={this.props.deliveryItem}
+                            key={this.state.deliveryItem.deliveryId}
+                            deliveryItem={this.state.deliveryItem}
                             onDismiss={() => this.setState({ isDeleting: false })}
                             onDelete={() => {
-                                this.props.onDelete(this.props.deliveryItem);
+                                this.props.onDelete(this.state.deliveryItem);
                                 this.setState({ isDeleting: false });
                             }} />
                     )}
@@ -211,11 +220,10 @@ export class DeliveryItemCard extends React.Component<IDeliveryItemCardProps, ID
 
 
 
-    private loadDeliveryTableItemInfo(relatedWits: IRelatedWit[]): void {
-        const witArray = relatedWits.map(wit => SdkService.getWitDetails(wit.id));
-
+    private loadDeliveryTableItemInfo(): void {
+        this.setState({ relatedWitLoaded: false });
+        const witArray = this.state.deliveryItem.relatedWits.map(wit => SdkService.getWitDetails(wit.id));
         this.deliveryTableItens = new ArrayItemProvider<IRelatedWitTableItem>(witArray);
-
         setTimeout(() => { this.setState({ relatedWitLoaded: true }); }, 2500);
     }
 
