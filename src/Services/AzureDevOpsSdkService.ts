@@ -1,12 +1,13 @@
 import * as SDK from 'azure-devops-extension-sdk'
 import { IAzureDevOpsService } from "../Interfaces/IAzureDevOpsService"
-import { IExtensionDataManager, IExtensionDataService, CommonServiceIds } from 'azure-devops-extension-api';
+import { IExtensionDataManager, IExtensionDataService, CommonServiceIds, ILocationService, IProjectPageService } from 'azure-devops-extension-api';
 import { getClient } from 'azure-devops-extension-api';
-import { WorkItemTrackingRestClient, WorkItemExpand, WorkItem, WorkItemRelation, IWorkItemFormService, WorkItemTrackingServiceIds, IWorkItemFormNavigationService } from 'azure-devops-extension-api/WorkItemTracking';
+import { WorkItemTrackingRestClient, WorkItemExpand, WorkItem, WorkItemRelation, WorkItemTrackingServiceIds, IWorkItemFormNavigationService } from 'azure-devops-extension-api/WorkItemTracking';
 import { IDeliveryItem, IRelatedWit } from '../Interfaces/IDeliveryItem';
 import { IRelatedWitTableItem } from '../Components/DeliveryItemCard';
 import { Statuses } from 'azure-devops-ui/Components/Status/Status';
 import { IStatusProps } from 'azure-devops-ui/Status';
+import _ from 'lodash';
 
 export class AzureDevOpsSdkService implements IAzureDevOpsService {
 
@@ -15,6 +16,7 @@ export class AzureDevOpsSdkService implements IAzureDevOpsService {
     private _dataManager?: IExtensionDataManager;
     private _workItemTrackingClient?: WorkItemTrackingRestClient;
     private _formService?: IWorkItemFormNavigationService;
+    private _projectService?: IProjectPageService;
 
     initialize(): void {
         SDK.init();
@@ -25,6 +27,11 @@ export class AzureDevOpsSdkService implements IAzureDevOpsService {
         const accessToken = await SDK.getAccessToken();
         const extDataService = await SDK.getService<IExtensionDataService>(CommonServiceIds.ExtensionDataService);
         this._formService = await SDK.getService<IWorkItemFormNavigationService>(WorkItemTrackingServiceIds.WorkItemFormNavigationService);
+
+        this._projectService = await SDK.getService<IProjectPageService>(CommonServiceIds.ProjectPageService);
+
+        const project = await this._projectService.getProject();
+        this.COLLECTION_NAME += project!.name;
 
         this._dataManager = await extDataService.getExtensionDataManager(SDK.getExtensionContext().id, accessToken);
         this._workItemTrackingClient = getClient(WorkItemTrackingRestClient);
@@ -54,6 +61,7 @@ export class AzureDevOpsSdkService implements IAzureDevOpsService {
         return await Promise.resolve(deliveryItens);
     }
     async saveDeliveryItem(deliveryItem: IDeliveryItem): Promise<void> {
+        _.merge(deliveryItem, { __etag: -1 });
         await this._dataManager!.setDocument(this.COLLECTION_NAME, deliveryItem);
     }
     async deleteDeliveryItem(deliveryItem: IDeliveryItem): Promise<void> {
@@ -101,13 +109,15 @@ export class AzureDevOpsSdkService implements IAzureDevOpsService {
 
         switch (witState) {
             case "New":
-                return Statuses.Waiting;
-            case "Approved":
                 return Statuses.Queued;
+            case "Approved":
+                return Statuses.Waiting;
             case "Commited":
                 return Statuses.Running;
             case "Done":
                 return Statuses.Success;
+            case "Removed":
+                return Statuses.Canceled;
             default:
                 break;
         }
@@ -132,6 +142,9 @@ export class AzureDevOpsSdkService implements IAzureDevOpsService {
 
     private async getChildTasks(wit: WorkItem): Promise<WorkItem[]> {
         var tasks: WorkItem[] = new Array<WorkItem>();
+
+        if (!wit.relations)
+            return Promise.resolve(tasks);
 
         for (let relation of wit.relations)
             if (relation.rel === "System.LinkTypes.Hierarchy-Forward"

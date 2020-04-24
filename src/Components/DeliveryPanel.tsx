@@ -10,7 +10,7 @@ import SdkService from "..";
 
 interface IDeliveryPanelProps {
     onDismiss: () => void;
-    onSave: (deliveryItem: IDeliveryItem) => void;
+    onSave: (deliveryItem: IDeliveryItem) => Promise<void>;
     deliveryId?: string;
 }
 
@@ -68,7 +68,7 @@ export class DeliveryPanel extends React.Component<IDeliveryPanelProps, IDeliver
                         text: "Cancelar", onClick: () => { this.handleDismiss() }
                     },
                     {
-                        text: "Salvar", primary: true, onClick: () => { this.handleSave() }
+                        text: "Salvar", primary: true, onClick: async () => { await this.handleSave() }
                     }
                 ]}>
                 <div className="flex-column rhythm-vertical-16">
@@ -118,7 +118,7 @@ export class DeliveryPanel extends React.Component<IDeliveryPanelProps, IDeliver
     private handleDismiss() {
         this.props.onDismiss();
     }
-    private handleSave() {
+    private async handleSave() {
 
         var validationErrors = { ...this.state };
 
@@ -146,6 +146,6 @@ export class DeliveryPanel extends React.Component<IDeliveryPanelProps, IDeliver
             description: this.state.description!,
             relatedWits: this.state.relatedWits!
         };
-        this.props.onSave(deliveryItem);
+        await this.props.onSave(deliveryItem);
     }
 }

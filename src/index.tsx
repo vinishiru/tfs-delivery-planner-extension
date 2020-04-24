@@ -157,13 +157,13 @@ class DeliveryPlanner extends React.Component<{}, IDeliveryPlannerState> {
     }
 
     private async handleDeliveryPanelSave(deliveryItem: IDeliveryItem) {
-        this.sdkService.saveDeliveryItem(deliveryItem);
+        await this.sdkService.saveDeliveryItem(deliveryItem);
         const deliveryItens = await this.sdkService.getDeliveryItens(this.state.activeFilter)
         this.setState({ allDeliveryItens: deliveryItens, creatingOrEditingDelivery: false, editingDeliveryId: undefined });
     }
 
     private async handleDeliveryItemDelete(deliveryItem: IDeliveryItem) {
-        this.sdkService.deleteDeliveryItem(deliveryItem);
+        await this.sdkService.deleteDeliveryItem(deliveryItem);
         const deliveryItens = await this.sdkService.getDeliveryItens(this.state.activeFilter)
         this.setState({ allDeliveryItens: deliveryItens });
     }
