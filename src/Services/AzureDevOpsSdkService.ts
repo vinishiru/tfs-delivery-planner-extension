@@ -29,17 +29,17 @@ export class AzureDevOpsSdkService implements IAzureDevOpsService {
         return SDK.getUser().displayName;
     }
     async getDeliveryItem(id: string): Promise<IDeliveryItem | undefined> {
-        return await this._dataManager?.getDocument(this.COLLECTION_NAME, id);
+        return await this._dataManager!.getDocument(this.COLLECTION_NAME, id);
     }
     async getDeliveryItens(filter?: string | undefined): Promise<IDeliveryItem[]> {
 
         if (!filter)
-            return await this._dataManager?.getDocuments(this.COLLECTION_NAME) as IDeliveryItem[];
+            return await this._dataManager!.getDocuments(this.COLLECTION_NAME) as IDeliveryItem[];
 
         let deliveryItens: IDeliveryItem[] = [];
-        let collection = await this._dataManager?.queryCollectionsByName([this.COLLECTION_NAME]);
+        let collection = await this._dataManager!.queryCollectionsByName([this.COLLECTION_NAME]);
 
-        if (collection?.length != 0)
+        if (collection!.length != 0)
             return await Promise.resolve(deliveryItens);
 
         deliveryItens = collection[0].documents;
@@ -49,13 +49,13 @@ export class AzureDevOpsSdkService implements IAzureDevOpsService {
         return await Promise.resolve(deliveryItens);
     }
     async saveDeliveryItem(deliveryItem: IDeliveryItem): Promise<void> {
-        await this._dataManager?.setDocument(this.COLLECTION_NAME, deliveryItem);
+        await this._dataManager!.setDocument(this.COLLECTION_NAME, deliveryItem);
     }
     async deleteDeliveryItem(deliveryItem: IDeliveryItem): Promise<void> {
-        await this._dataManager?.deleteDocument(this.COLLECTION_NAME, deliveryItem.id);
+        await this._dataManager!.deleteDocument(this.COLLECTION_NAME, deliveryItem.id);
     }
     async getWitDetails(witId: number): Promise<IRelatedWitTableItem | undefined> {
-        var wit = await this._workItemTrackingClient?.getWorkItem(witId, undefined, undefined, undefined, WorkItemExpand.All);
+        var wit = await this._workItemTrackingClient!.getWorkItem(witId, undefined, undefined, undefined, WorkItemExpand.All);
 
         if (!wit)
             return;
@@ -64,10 +64,10 @@ export class AzureDevOpsSdkService implements IAzureDevOpsService {
 
         return Promise.resolve({
             status: Statuses.Success,
-            id: wit?.fields["System.Id"],
-            title: wit?.fields["System.Title"],
-            effort: wit?.fields["Microsoft.VSTS.Scheduling.Effort"],
-            column: wit?.fields["System.BoardColumn"] + (wit?.fields["System.BoardColumnDone"] && "Done"),
+            id: wit.fields["System.Id"],
+            title: wit.fields["System.Title"],
+            effort: wit.fields["Microsoft.VSTS.Scheduling.Effort"],
+            column: wit.fields["System.BoardColumn"] + (wit.fields["System.BoardColumnDone"] && " Done"),
             totalTaskWork: "10/80",
             todoTasksCount: 8,
             inProgressTaskCount: 4,
@@ -77,23 +77,23 @@ export class AzureDevOpsSdkService implements IAzureDevOpsService {
     }
 
     async getWit(witId: number): Promise<IRelatedWit | undefined> {
-        var wit = await this._workItemTrackingClient?.getWorkItem(witId, undefined, undefined, undefined, WorkItemExpand.All);
+        var wit = await this._workItemTrackingClient!.getWorkItem(witId, undefined, undefined, undefined, WorkItemExpand.All);
 
         if (!wit)
             return;
 
         return Promise.resolve({
-            id: wit?.fields["System.Id"],
-            title: wit?.fields["System.Title"],
+            id: wit.fields["System.Id"],
+            title: wit.fields["System.Title"],
         });
     }
 
     async getChildTasks(wit: WorkItem): Promise<WorkItem[]> {
         var tasks: WorkItem[] = [];
 
-        wit?.relations.forEach(async (relation) => {
+        wit.relations.forEach(async (relation) => {
             var taskId = this.getTaskId(relation);
-            tasks.push(await this._workItemTrackingClient?.getWorkItem(taskId, undefined, undefined, undefined, WorkItemExpand.All)!);
+            tasks.push(await this._workItemTrackingClient!.getWorkItem(taskId, undefined, undefined, undefined, WorkItemExpand.All)!);
         });
         return tasks;
     }
