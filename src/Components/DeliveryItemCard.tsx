@@ -194,7 +194,7 @@ export class DeliveryItemCard extends React.Component<IDeliveryItemCardProps, ID
                                 />
                             )}
 
-                        {!this.state.relatedWitLoaded &&
+                        {!this.state.relatedWitLoaded && this.state.deliveryItem.relatedWits &&
                             (
                                 <div className={"flex-grow padding-16"} >
                                     <Skeleton count={this.state.deliveryItem.relatedWits.length + 1} />
@@ -221,10 +221,14 @@ export class DeliveryItemCard extends React.Component<IDeliveryItemCardProps, ID
 
 
     private loadDeliveryTableItemInfo(): void {
-        this.setState({ relatedWitLoaded: false });
-        const witArray = this.state.deliveryItem.relatedWits.map(wit => SdkService.getWitDetails(wit.id));
-        this.deliveryTableItens = new ArrayItemProvider<IRelatedWitTableItem>(witArray);
-        setTimeout(() => { this.setState({ relatedWitLoaded: true }); }, 2500);
+        if (this.state.deliveryItem.relatedWits) {
+            this.setState({ relatedWitLoaded: false });
+            const witArray = this.state.deliveryItem.relatedWits.map(wit => SdkService.getWitDetails(wit.id));
+            this.deliveryTableItens = new ArrayItemProvider<IRelatedWitTableItem>(witArray);
+            setTimeout(() => { this.setState({ relatedWitLoaded: true }); }, 2500);
+        }
+        else
+            this.setState({ relatedWitLoaded: true });
     }
 
     private commandBarItems(deliveryItem: IDeliveryItem): IHeaderCommandBarItem[] {

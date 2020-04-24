@@ -5,7 +5,9 @@ import { IHeaderCommandBarItem } from "azure-devops-ui/HeaderCommandBar";
 import { Page } from "azure-devops-ui/Page";
 import { Tab, TabBar, TabSize } from "azure-devops-ui/Tabs";
 import { ZeroData, ZeroDataActionType } from "azure-devops-ui/ZeroData";
-
+import { FilterBar } from "azure-devops-ui/FilterBar";
+import { IFilter, Filter, FILTER_CHANGE_EVENT, IFilterState } from "azure-devops-ui/Utilities/Filter";
+import { KeywordFilterBarItem } from "azure-devops-ui/TextFilterBarItem";
 
 import { IAzureDevOpsService } from "./Interfaces/IAzureDevOpsService";
 import { MoqAzureDevOpsService } from "./Services/MoqAzureDevOpsService";
@@ -18,52 +20,65 @@ export interface IDeliveryPlannerState {
     userDisplayName?: string;
     creatingOrEditingDelivery: boolean;
     editingDeliveryId?: string;
+    activeFilter?: string
+
+    allDeliveryItens: IDeliveryItem[];
 }
 
 class DeliveryPlanner extends React.Component<{}, IDeliveryPlannerState> {
 
+    FILTRO_KEY: string = "keyword";
     sdkService: IAzureDevOpsService;
-    allDeliveryItens: IDeliveryItem[];
+    filter: IFilter;
 
     constructor(props: {}) {
         super(props);
 
         this.sdkService = SdkService;
-        this.state = { creatingOrEditingDelivery: false };
-        this.allDeliveryItens = [];
+        this.state = { creatingOrEditingDelivery: false, allDeliveryItens: [] };
+        this.filter = new Filter();
+
         this.createNewDelivery = this.createNewDelivery.bind(this);
         this.handleDeliveryPanelDismiss = this.handleDeliveryPanelDismiss.bind(this);
         this.handleDeliveryPanelSave = this.handleDeliveryPanelSave.bind(this);
         this.handleDeliveryItemDelete = this.handleDeliveryItemDelete.bind(this);
         this.handleDeliveryItemEdit = this.handleDeliveryItemEdit.bind(this);
+        this.handleFilterChange = this.handleFilterChange.bind(this);
 
+        this.filter.subscribe(this.handleFilterChange, FILTER_CHANGE_EVENT);
     }
 
     public async componentDidMount() {
         this.sdkService.initialize();
         await this.sdkService.ready();
 
-        this.allDeliveryItens = await this.sdkService.getAllDeliveryItens();
-        this.setState({ userDisplayName: this.sdkService.getUserDisplayName() });
+        const deliveryItens = await this.sdkService.getDeliveryItens();
+        this.setState({ userDisplayName: this.sdkService.getUserDisplayName(), allDeliveryItens: deliveryItens });
     }
 
     public render(): JSX.Element {
-        const items = this.allDeliveryItens.map(item =>
+        const deliveryItemCards = this.state.allDeliveryItens.map(item =>
             <DeliveryItemCard key={item.deliveryId} deliveryItem={item} onDelete={this.handleDeliveryItemDelete} onEdit={this.handleDeliveryItemEdit} />
         );
         return (
             <Page className="flex-grow rhythm-vertical-16">
                 <Header title="Delivery Planner"
                     commandBarItems={this.getCommandBarItems()}
-                    description="Descrição do componente."
+                    description="Planeje entregas, facilite o acompanhamento dos seus projetos."
                     titleSize={TitleSize.Large} />
 
+                <FilterBar
+                    filter={this.filter}>
+                    <KeywordFilterBarItem placeholder={"Filtrar"}
+                        filterItemKey={this.FILTRO_KEY} />
+                </FilterBar>
+
                 <TabBar
-                    onSelectedTabChanged={this.createNewDelivery}
+                    onSelectedTabChanged={() => { }}
                     selectedTabId="entregasPlanejadas"
                     tabSize={TabSize.Compact}>
-
                     <Tab name="Entregas Planejadas" id="entregasPlanejadas" />
+                    <Tab name="Entregas Concluídas" id="entregasConcluidas" />
                 </TabBar>
 
                 {(this.state.creatingOrEditingDelivery) && (
@@ -71,22 +86,19 @@ class DeliveryPlanner extends React.Component<{}, IDeliveryPlannerState> {
                 )}
                 {this.hasItems() &&
                     <div className="padding-16 rhythm-vertical-16">
-                        {items}
+                        {deliveryItemCards}
                     </div>
                 }
 
                 {!this.hasItems() &&
                     this.renderZeroData()
                 }
-
-
-
             </Page >
         );
     }
 
     private hasItems(): boolean {
-        return this.allDeliveryItens.length !== 0;
+        return this.state.allDeliveryItens.length !== 0;
     }
 
     private renderZeroData(): JSX.Element {
@@ -133,20 +145,23 @@ class DeliveryPlanner extends React.Component<{}, IDeliveryPlannerState> {
         this.setState({ creatingOrEditingDelivery: true, editingDeliveryId: undefined });
     }
 
+    private async handleFilterChange(changedState: IFilterState) {
+        const filter = this.filter.getFilterItemValue(this.FILTRO_KEY) as string;
+        this.setState({ allDeliveryItens: await this.sdkService.getDeliveryItens(filter), activeFilter: filter });
+    }
+
     private handleDeliveryPanelDismiss() {
         this.setState({ creatingOrEditingDelivery: false, editingDeliveryId: undefined });
     }
 
     private async handleDeliveryPanelSave(deliveryItem: IDeliveryItem) {
         this.sdkService.saveDeliveryItem(deliveryItem);
-        this.allDeliveryItens = await this.sdkService.getAllDeliveryItens();
-        this.setState({ creatingOrEditingDelivery: false, editingDeliveryId: undefined });
+        this.setState({ allDeliveryItens: await this.sdkService.getDeliveryItens(this.state.activeFilter), creatingOrEditingDelivery: false, editingDeliveryId: undefined });
     }
 
     private async handleDeliveryItemDelete(deliveryItem: IDeliveryItem) {
         this.sdkService.deleteDeliveryItem(deliveryItem);
-        this.allDeliveryItens = await this.sdkService.getAllDeliveryItens();
-        this.setState({});
+        this.setState({ allDeliveryItens: await this.sdkService.getDeliveryItens(this.state.activeFilter) });
     }
 
     private handleDeliveryItemEdit(id: string) {

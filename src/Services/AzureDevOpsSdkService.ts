@@ -5,9 +5,6 @@ export class AzureDevOpsSdkService implements IAzureDevOpsService {
     getDeliveryItem(): Promise<import("../Interfaces/IDeliveryItem").IDeliveryItem> {
         throw new Error("Method not implemented.");
     }
-    getWit(witId: number): import("../Interfaces/IDeliveryItem").IRelatedWit {
-        throw new Error("Method not implemented.");
-    }
     getWitDetails(witId: number): import("../Components/DeliveryItemCard").IRelatedWitTableItem {
         throw new Error("Method not implemented.");
     }
@@ -17,7 +14,7 @@ export class AzureDevOpsSdkService implements IAzureDevOpsService {
     saveDeliveryItem(deliveryItem: import("../Interfaces/IDeliveryItem").IDeliveryItem): void {
         throw new Error("Method not implemented.");
     }
-    getAllDeliveryItens(): Promise<import("../Interfaces/IDeliveryItem").IDeliveryItem[]> {
+    getDeliveryItens(filter: string): Promise<import("../Interfaces/IDeliveryItem").IDeliveryItem[]> {
         throw new Error("Method not implemented.");
     }
     initialize(): void {

@@ -80,15 +80,21 @@ export class MoqAzureDevOpsService implements IAzureDevOpsService {
         return "Dummy User";
     }
 
-    async getAllDeliveryItens(): Promise<IDeliveryItem[]> {
-        return this._deliveryItens.sort((a, b) => a.creationDate < b.creationDate ? -1 : 1);
+    async getDeliveryItens(filter?: string): Promise<IDeliveryItem[]> {
+        let deliveryItens = this._deliveryItens;
+
+        if (filter)
+            deliveryItens = deliveryItens.filter(item =>
+                item.name.includes(filter));
+
+        return deliveryItens.sort((a, b) => a.creationDate < b.creationDate ? -1 : 1);
         //return this._allDeliveryItemsMock;
     }
 
     getWitDetails(witId: number): IRelatedWitTableItem {
         const wit = this.getWit(witId);
         return {
-            status: Statuses.Success,
+            status: this.getWitStatusIcon(wit),
             id: wit.id,
             title: wit.title,
             effort: 10,
@@ -100,7 +106,11 @@ export class MoqAzureDevOpsService implements IAzureDevOpsService {
         };
     }
 
-    getWit(witId: number): IRelatedWit {
+    private getWitStatusIcon(wit: IRelatedWit) {
+        return Statuses.Success;
+    }
+
+    private getWit(witId: number): IRelatedWit {
         return this._witData
             .filter(
                 testItem => testItem.id === witId

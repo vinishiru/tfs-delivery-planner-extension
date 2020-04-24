@@ -75,7 +75,7 @@ export class DeliveryPanel extends React.Component<IDeliveryPanelProps, IDeliver
                     <FormItem
                         label={"Nome da entrega:"}
                         error={this.state.nameError}
-                        message={this.state.nameError && "Informe uma descrição."}
+                        message={this.state.nameError && "Informe um nome."}
                     >
                         <TextField
                             value={name}
@@ -102,7 +102,7 @@ export class DeliveryPanel extends React.Component<IDeliveryPanelProps, IDeliver
                     <FormItem
                         label={"Work Itens:"}
                         error={this.state.descriptionError}
-                        message={this.state.descriptionError && "Informe uma descrição."}>
+                        message={this.state.descriptionError && "Informe alguns work itens."}>
                         <WorkItemPicker relatedWits={relatedWits || []} updateRelatedWits={this.handleUpdatedRelatedWits} />
                     </FormItem>
 
