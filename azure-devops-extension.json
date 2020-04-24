@@ -2,7 +2,7 @@
     "manifestVersion": 1,
     "id": "simply-delivery-planner",
     "publisher": "simply-devops",
-    "version": "1.0.8",
+    "version": "1.0.10",
     "name": "Delivery Planner",
     "description": "Azure DevOps Extension",
     "categories": [
@@ -28,6 +28,9 @@
                 "supportsMobile": true
             }
         }
+    ],
+    "scopes": [
+        "vso.work"
     ],
     "icons": {
         "default": "logo.png"

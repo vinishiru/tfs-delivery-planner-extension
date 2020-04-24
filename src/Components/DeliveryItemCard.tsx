@@ -156,7 +156,7 @@ interface IDeliveryItemCardState {
 
 export class DeliveryItemCard extends React.Component<IDeliveryItemCardProps, IDeliveryItemCardState> {
 
-    deliveryTableItens: ArrayItemProvider<IRelatedWitTableItem>;
+    deliveryTableItens: ArrayItemProvider<IRelatedWitTableItem | undefined>;
 
     constructor(props: IDeliveryItemCardProps) {
         super(props);
@@ -188,7 +188,7 @@ export class DeliveryItemCard extends React.Component<IDeliveryItemCardProps, ID
                     >
                         {this.state.relatedWitLoaded &&
                             (
-                                <Table<Partial<IRelatedWitTableItem>>
+                                <Table<Partial<IRelatedWitTableItem | undefined>>
                                     columns={sizableColumns}
                                     itemProvider={this.deliveryTableItens}
                                 />
@@ -224,8 +224,8 @@ export class DeliveryItemCard extends React.Component<IDeliveryItemCardProps, ID
         if (this.state.deliveryItem.relatedWits) {
             this.setState({ relatedWitLoaded: false });
             const witArray = await Promise.all(this.state.deliveryItem.relatedWits.map(wit => SdkService.getWitDetails(wit.id)));
-            this.deliveryTableItens = new ArrayItemProvider<IRelatedWitTableItem>(witArray);
-            setTimeout(() => { this.setState({ relatedWitLoaded: true }); }, 2500);
+            this.deliveryTableItens = new ArrayItemProvider<IRelatedWitTableItem | undefined>(witArray);
+            this.setState({ relatedWitLoaded: true });
         }
         else
             this.setState({ relatedWitLoaded: true });
