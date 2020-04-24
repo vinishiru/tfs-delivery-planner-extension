@@ -54,11 +54,12 @@ export class MoqAzureDevOpsService implements IAzureDevOpsService {
         // return await this._allDeliveryItemsMock[0];
     }
 
-    deleteDeliveryItem(deliveryItem: IDeliveryItem): void {
+    deleteDeliveryItem(deliveryItem: IDeliveryItem): Promise<void> {
         this._deliveryItens = this._deliveryItens.filter(item => item.id !== deliveryItem.id);
+        return Promise.resolve();
     }
 
-    saveDeliveryItem(deliveryItem: IDeliveryItem): void {
+    saveDeliveryItem(deliveryItem: IDeliveryItem): Promise<void> {
 
         if (deliveryItem.id)
             this.deleteDeliveryItem(deliveryItem);
@@ -66,6 +67,7 @@ export class MoqAzureDevOpsService implements IAzureDevOpsService {
             deliveryItem.id = Math.random().toString();
 
         this._deliveryItens.push(deliveryItem);
+        return Promise.resolve();
     }
 
     initialize(): void {
@@ -91,12 +93,12 @@ export class MoqAzureDevOpsService implements IAzureDevOpsService {
         //return this._allDeliveryItemsMock;
     }
 
-    getWitDetails(witId: number): Promise<IRelatedWitTableItem> {
-        const wit = this.getWit(witId);
+    async getWitDetails(witId: number): Promise<IRelatedWitTableItem> {
+        const wit = await this.getWit(witId);
         return Promise.resolve({
             status: Statuses.Success,
-            id: wit.id,
-            title: wit.title,
+            id: wit!.id,
+            title: wit!.title,
             effort: 10,
             column: "Dev Done",
             totalTaskWork: "10/80",
@@ -106,7 +108,7 @@ export class MoqAzureDevOpsService implements IAzureDevOpsService {
         });
     }
 
-    private getWit(witId: number): IRelatedWit {
+    async getWit(witId: number): Promise<IRelatedWit | undefined> {
         return this._witData
             .filter(
                 testItem => testItem.id === witId

@@ -30,9 +30,9 @@ export const WorkItemPicker: React.FunctionComponent<IWorkItemPickerProps> = (pr
         };
     };
 
-    const onSearchChanged = (searchValue: string) => {
+    const onSearchChanged = async (searchValue: string) => {
 
-        var witFound = SdkService.getWit(+searchValue);
+        var witFound = await SdkService.getWit(+searchValue);
         if (witFound)
             setSuggestions([witFound]);
         else

@@ -7,7 +7,8 @@ export interface IAzureDevOpsService {
     getUserDisplayName(): string,
     getDeliveryItem(id: string): Promise<IDeliveryItem | undefined>,
     getDeliveryItens(filter?: string): Promise<IDeliveryItem[]>,
-    saveDeliveryItem(deliveryItem: IDeliveryItem): void
-    deleteDeliveryItem(deliveryItem: IDeliveryItem): void
+    saveDeliveryItem(deliveryItem: IDeliveryItem): Promise<void>
+    deleteDeliveryItem(deliveryItem: IDeliveryItem): Promise<void>
     getWitDetails(witId: number): Promise<IRelatedWitTableItem | undefined>
+    getWit(witId: number): Promise<IRelatedWit | undefined>
 }

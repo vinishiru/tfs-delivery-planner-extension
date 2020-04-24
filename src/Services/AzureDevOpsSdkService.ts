@@ -5,6 +5,7 @@ import { getClient } from 'azure-devops-extension-api';
 import { WorkItemTrackingRestClient, WorkItemExpand, WorkItem, WorkItemRelation } from 'azure-devops-extension-api/WorkItemTracking';
 import { IDeliveryItem } from '../Interfaces/IDeliveryItem';
 import { IRelatedWitTableItem } from '../Components/DeliveryItemCard';
+import { Statuses } from 'azure-devops-ui/Components/Status/Status';
 
 export class AzureDevOpsSdkService implements IAzureDevOpsService {
 
@@ -61,8 +62,8 @@ export class AzureDevOpsSdkService implements IAzureDevOpsService {
 
         var tasks = await this.getChildTasks(wit!);
 
-        return await Promise.resolve({
-            status: this.getWitStatusIcon(wit),
+        return Promise.resolve({
+            status: Statuses.Success,
             id: wit?.fields["System.Id"],
             title: wit?.fields["System.Title"],
             effort: wit?.fields["Microsoft.VSTS.Scheduling.Effort"],
