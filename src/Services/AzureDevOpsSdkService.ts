@@ -118,7 +118,7 @@ export class AzureDevOpsSdkService implements IAzureDevOpsService {
     }
 
     openWorkItem(witId: number): void {
-        this._formService?.openWorkItem(witId);
+        this._formService!.openWorkItem(witId);
     }
 
     private async getChildTasks(wit: WorkItem): Promise<WorkItem[]> {
