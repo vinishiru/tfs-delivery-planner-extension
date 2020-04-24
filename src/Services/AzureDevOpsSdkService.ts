@@ -3,7 +3,7 @@ import { IAzureDevOpsService } from "../Interfaces/IAzureDevOpsService"
 import { IExtensionDataManager, IExtensionDataService, CommonServiceIds } from 'azure-devops-extension-api';
 import { getClient } from 'azure-devops-extension-api';
 import { WorkItemTrackingRestClient, WorkItemExpand, WorkItem, WorkItemRelation } from 'azure-devops-extension-api/WorkItemTracking';
-import { IDeliveryItem } from '../Interfaces/IDeliveryItem';
+import { IDeliveryItem, IRelatedWit } from '../Interfaces/IDeliveryItem';
 import { IRelatedWitTableItem } from '../Components/DeliveryItemCard';
 import { Statuses } from 'azure-devops-ui/Components/Status/Status';
 
@@ -48,10 +48,10 @@ export class AzureDevOpsSdkService implements IAzureDevOpsService {
 
         return await Promise.resolve(deliveryItens);
     }
-    async saveDeliveryItem(deliveryItem: IDeliveryItem): void {
+    async saveDeliveryItem(deliveryItem: IDeliveryItem): Promise<void> {
         await this._dataManager?.setDocument(this.COLLECTION_NAME, deliveryItem);
     }
-    async deleteDeliveryItem(deliveryItem: IDeliveryItem): void {
+    async deleteDeliveryItem(deliveryItem: IDeliveryItem): Promise<void> {
         await this._dataManager?.deleteDocument(this.COLLECTION_NAME, deliveryItem.id);
     }
     async getWitDetails(witId: number): Promise<IRelatedWitTableItem | undefined> {
@@ -74,6 +74,18 @@ export class AzureDevOpsSdkService implements IAzureDevOpsService {
             doneTaskCount: 10
         });
 
+    }
+
+    async getWit(witId: number): Promise<IRelatedWit | undefined> {
+        var wit = await this._workItemTrackingClient?.getWorkItem(witId, undefined, undefined, undefined, WorkItemExpand.All);
+
+        if (!wit)
+            return;
+
+        return Promise.resolve({
+            id: wit?.fields["System.Id"],
+            title: wit?.fields["System.Title"],
+        });
     }
 
     async getChildTasks(wit: WorkItem): Promise<WorkItem[]> {
