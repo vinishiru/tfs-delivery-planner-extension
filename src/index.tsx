@@ -58,7 +58,7 @@ class DeliveryPlanner extends React.Component<{}, IDeliveryPlannerState> {
 
     public render(): JSX.Element {
         const deliveryItemCards = this.state.allDeliveryItens.map(item =>
-            <DeliveryItemCard key={item.deliveryId} deliveryItem={item} onDelete={this.handleDeliveryItemDelete} onEdit={this.handleDeliveryItemEdit} />
+            <DeliveryItemCard key={item.id} deliveryItem={item} onDelete={this.handleDeliveryItemDelete} onEdit={this.handleDeliveryItemEdit} />
         );
         return (
             <Page className="flex-grow rhythm-vertical-16">

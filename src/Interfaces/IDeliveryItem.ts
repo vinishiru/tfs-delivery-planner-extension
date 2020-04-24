@@ -1,5 +1,5 @@
 export interface IDeliveryItem {
-    deliveryId: string,
+    id: string,
     name: string,
     description: string,
     creationDate: Date,

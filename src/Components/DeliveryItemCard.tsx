@@ -166,13 +166,13 @@ export class DeliveryItemCard extends React.Component<IDeliveryItemCardProps, ID
     }
 
     public async componentDidMount() {
-        this.loadDeliveryTableItemInfo();
+        await this.loadDeliveryTableItemInfo();
     }
 
     public async componentWillReceiveProps(props: IDeliveryItemCardProps) {
         if (!_.isEqual(this.state.deliveryItem, props.deliveryItem)) {
-            this.setState({ deliveryItem: props.deliveryItem }, () => {
-                this.loadDeliveryTableItemInfo();
+            this.setState({ deliveryItem: props.deliveryItem }, async () => {
+                await this.loadDeliveryTableItemInfo();
             });
         }
     }
@@ -206,7 +206,7 @@ export class DeliveryItemCard extends React.Component<IDeliveryItemCardProps, ID
                 {this.state.isDeleting &&
                     (
                         <DeliveryItemDeleteDialog
-                            key={this.state.deliveryItem.deliveryId}
+                            key={this.state.deliveryItem.id}
                             deliveryItem={this.state.deliveryItem}
                             onDismiss={() => this.setState({ isDeleting: false })}
                             onDelete={() => {
@@ -220,10 +220,10 @@ export class DeliveryItemCard extends React.Component<IDeliveryItemCardProps, ID
 
 
 
-    private loadDeliveryTableItemInfo(): void {
+    private async loadDeliveryTableItemInfo(): Promise<void> {
         if (this.state.deliveryItem.relatedWits) {
             this.setState({ relatedWitLoaded: false });
-            const witArray = this.state.deliveryItem.relatedWits.map(wit => SdkService.getWitDetails(wit.id));
+            const witArray = await Promise.all(this.state.deliveryItem.relatedWits.map(wit => SdkService.getWitDetails(wit.id)));
             this.deliveryTableItens = new ArrayItemProvider<IRelatedWitTableItem>(witArray);
             setTimeout(() => { this.setState({ relatedWitLoaded: true }); }, 2500);
         }
@@ -247,7 +247,7 @@ export class DeliveryItemCard extends React.Component<IDeliveryItemCardProps, ID
                 id: "refresh",
                 text: "Atualizar",
                 onActivate: (e, i) => {
-                    alert("Atualizar item " + deliveryItem.deliveryId);
+                    alert("Atualizar item " + deliveryItem.id);
                 },
                 iconProps: {
                     iconName: "Refresh"
@@ -258,7 +258,7 @@ export class DeliveryItemCard extends React.Component<IDeliveryItemCardProps, ID
                 id: "edit",
                 text: "Editar",
                 onActivate: () => {
-                    this.props.onEdit(deliveryItem.deliveryId);
+                    this.props.onEdit(deliveryItem.id);
                 },
                 iconProps: {
                     iconName: "Edit"

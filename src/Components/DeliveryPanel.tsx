@@ -140,7 +140,7 @@ export class DeliveryPanel extends React.Component<IDeliveryPanelProps, IDeliver
 
         var deliveryItem: IDeliveryItem;
         deliveryItem = {
-            deliveryId: this.props.deliveryId!,
+            id: this.props.deliveryId!,
             creationDate: this.state.creationDate! || new Date(),
             name: this.state.name!,
             description: this.state.description!,

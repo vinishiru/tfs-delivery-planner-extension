@@ -9,5 +9,5 @@ export interface IAzureDevOpsService {
     getDeliveryItens(filter?: string): Promise<IDeliveryItem[]>,
     saveDeliveryItem(deliveryItem: IDeliveryItem): void
     deleteDeliveryItem(deliveryItem: IDeliveryItem): void
-    getWitDetails(witId: number): IRelatedWitTableItem
+    getWitDetails(witId: number): Promise<IRelatedWitTableItem | undefined>
 }

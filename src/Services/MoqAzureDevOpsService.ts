@@ -10,7 +10,7 @@ export class MoqAzureDevOpsService implements IAzureDevOpsService {
 
     _allDeliveryItemsMock: IDeliveryItem[] = [
         {
-            deliveryId: "123456",
+            id: "123456",
             name: "Projeto A",
             creationDate: new Date(),
             description: "Entrega do Projeto A",
@@ -26,7 +26,7 @@ export class MoqAzureDevOpsService implements IAzureDevOpsService {
             ]
         },
         {
-            deliveryId: "789456",
+            id: "789456",
             name: "Projeto B",
             creationDate: new Date(),
             description: "Entrega do Projeto B",
@@ -50,20 +50,20 @@ export class MoqAzureDevOpsService implements IAzureDevOpsService {
     ];
 
     async getDeliveryItem(id: string): Promise<IDeliveryItem | undefined> {
-        return await Promise.resolve(this._deliveryItens.find(x => x.deliveryId === id));
+        return await Promise.resolve(this._deliveryItens.find(x => x.id === id));
         // return await this._allDeliveryItemsMock[0];
     }
 
     deleteDeliveryItem(deliveryItem: IDeliveryItem): void {
-        this._deliveryItens = this._deliveryItens.filter(item => item.deliveryId !== deliveryItem.deliveryId);
+        this._deliveryItens = this._deliveryItens.filter(item => item.id !== deliveryItem.id);
     }
 
     saveDeliveryItem(deliveryItem: IDeliveryItem): void {
 
-        if (deliveryItem.deliveryId)
+        if (deliveryItem.id)
             this.deleteDeliveryItem(deliveryItem);
         else
-            deliveryItem.deliveryId = Math.random().toString();
+            deliveryItem.id = Math.random().toString();
 
         this._deliveryItens.push(deliveryItem);
     }
@@ -91,10 +91,10 @@ export class MoqAzureDevOpsService implements IAzureDevOpsService {
         //return this._allDeliveryItemsMock;
     }
 
-    getWitDetails(witId: number): IRelatedWitTableItem {
+    getWitDetails(witId: number): Promise<IRelatedWitTableItem> {
         const wit = this.getWit(witId);
-        return {
-            status: this.getWitStatusIcon(wit),
+        return Promise.resolve({
+            status: Statuses.Success,
             id: wit.id,
             title: wit.title,
             effort: 10,
@@ -103,11 +103,7 @@ export class MoqAzureDevOpsService implements IAzureDevOpsService {
             todoTasksCount: 8,
             inProgressTaskCount: 4,
             doneTaskCount: 10
-        };
-    }
-
-    private getWitStatusIcon(wit: IRelatedWit) {
-        return Statuses.Success;
+        });
     }
 
     private getWit(witId: number): IRelatedWit {
