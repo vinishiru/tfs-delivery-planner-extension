@@ -44,7 +44,7 @@ export class AzureDevOpsSdkService implements IAzureDevOpsService {
         let deliveryItens: IDeliveryItem[] = [];
         let collection = await this._dataManager!.queryCollectionsByName([this.COLLECTION_NAME]);
 
-        if (collection!.length != 0)
+        if (collection!.length === 0)
             return await Promise.resolve(deliveryItens);
 
         deliveryItens = collection[0].documents;
@@ -67,20 +67,29 @@ export class AzureDevOpsSdkService implements IAzureDevOpsService {
 
         var tasks = await this.getChildTasks(wit!);
 
+        console.log(witId);
+        console.log(tasks);
+
         var totalTaskWorkDone = tasks.reduce((a, b) => a + (b.fields["Simply.HorasRealizadas"] || 0), 0);
         var totalTaskWorkPlanned = tasks.reduce((a, b) => a + (b.fields["Simply.HorasPrevistas"] || 0), 0);
 
-        return Promise.resolve({
+        console.log(`${totalTaskWorkDone}/${totalTaskWorkPlanned}`);
+
+        var relatedWitTableItem: IRelatedWitTableItem = {
             status: this.getWitStatus(wit),
             id: wit.fields["System.Id"],
             title: wit.fields["System.Title"],
             effort: wit.fields["Microsoft.VSTS.Scheduling.Effort"],
-            column: wit.fields["System.BoardColumn"] + (wit.fields["System.BoardColumnDone"] && " Done"),
+            column: wit.fields["System.BoardColumn"] + (wit.fields["System.BoardColumnDone"] ? " Done" : ""),
             totalTaskWork: `${totalTaskWorkDone}/${totalTaskWorkPlanned}`,
             todoTasksCount: tasks.filter(m => m.fields["System.State"] === "To Do").length,
             inProgressTaskCount: tasks.filter(m => m.fields["System.State"] === "In Progress").length,
             doneTaskCount: tasks.filter(m => m.fields["System.State"] === "Done").length
-        });
+        };
+
+        console.log(relatedWitTableItem);
+
+        return await Promise.resolve(relatedWitTableItem);
 
     }
 
@@ -122,14 +131,19 @@ export class AzureDevOpsSdkService implements IAzureDevOpsService {
     }
 
     private async getChildTasks(wit: WorkItem): Promise<WorkItem[]> {
-        var tasks: WorkItem[] = [];
+        var tasks: WorkItem[] = new Array<WorkItem>();
 
-        wit.relations.forEach(async (relation) => {
-            var taskId = this.getTaskId(relation);
-            tasks.push(await this._workItemTrackingClient!.getWorkItem(taskId, undefined, undefined, undefined, WorkItemExpand.All)!);
-        });
-        return tasks;
+        for (let relation of wit.relations)
+            if (relation.rel === "System.LinkTypes.Hierarchy-Forward"
+                && relation.attributes["name"] === "Child") {
+                var taskId = this.getTaskId(relation);
+                var task = await this._workItemTrackingClient!.getWorkItem(taskId, undefined, undefined, undefined, WorkItemExpand.All);
+                tasks.push(task);
+            }
+
+        return Promise.resolve(tasks);
     }
+
 
     private getTaskId(relation: WorkItemRelation): number {
         var index = relation.url.lastIndexOf("/");
