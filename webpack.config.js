@@ -14,9 +14,9 @@ fs.readdirSync(samplesDir).filter(dir => {
 });
 
 module.exports = {
-    entry: './src/Main.tsx',
+    entry: './src/index.tsx',
     output: {
-        filename: "[name].js"
+        filename: "index.js"
     },
     resolve: {
         extensions: [".ts", ".tsx", ".js"],
@@ -49,6 +49,10 @@ module.exports = {
             },
             {
                 test: /\.html$/,
+                loader: "file-loader"
+            },
+            {
+                test: /\.(png|jpe?g|gif)$/i,
                 loader: "file-loader"
             }
         ]

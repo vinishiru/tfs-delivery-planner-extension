@@ -15,6 +15,7 @@ import { DeliveryPanel } from "./Components/DeliveryPanel";
 import { DeliveryItemCard } from "./Components/DeliveryItemCard";
 import { showRootComponent } from "./Common"
 import { IDeliveryItem } from "./Interfaces/IDeliveryItem";
+import { AzureDevOpsSdkService } from "./Services/AzureDevOpsSdkService";
 
 export interface IDeliveryPlannerState {
     userDisplayName?: string;
@@ -170,7 +171,7 @@ class DeliveryPlanner extends React.Component<{}, IDeliveryPlannerState> {
 
 }
 
-const SdkService = new MoqAzureDevOpsService();
+const SdkService = new AzureDevOpsSdkService();
 export default SdkService;
 
 showRootComponent(<DeliveryPlanner />);

@@ -8,7 +8,7 @@ import { Status, StatusSize, IStatusProps } from "azure-devops-ui/Status";
 import { Link } from "azure-devops-ui/Link";
 import Skeleton from 'react-loading-skeleton';
 import ProgressBar from 'react-bootstrap/ProgressBar'
-import _ from "lodash";
+import * as _ from "lodash";
 
 import { IDeliveryItem } from "../Interfaces/IDeliveryItem";
 import { DeliveryItemDeleteDialog } from "./DeliveryItemDeleteDialog";
