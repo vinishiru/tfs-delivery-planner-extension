@@ -148,7 +148,8 @@ class DeliveryPlanner extends React.Component<{}, IDeliveryPlannerState> {
 
     private async handleFilterChange(changedState: IFilterState) {
         const filter = this.filter.getFilterItemValue(this.FILTRO_KEY) as string;
-        this.setState({ allDeliveryItens: await this.sdkService.getDeliveryItens(filter), activeFilter: filter });
+        const deliveryItens = await this.sdkService.getDeliveryItens(filter)
+        this.setState({ allDeliveryItens: deliveryItens, activeFilter: filter });
     }
 
     private handleDeliveryPanelDismiss() {
@@ -157,12 +158,14 @@ class DeliveryPlanner extends React.Component<{}, IDeliveryPlannerState> {
 
     private async handleDeliveryPanelSave(deliveryItem: IDeliveryItem) {
         this.sdkService.saveDeliveryItem(deliveryItem);
-        this.setState({ allDeliveryItens: await this.sdkService.getDeliveryItens(this.state.activeFilter), creatingOrEditingDelivery: false, editingDeliveryId: undefined });
+        const deliveryItens = await this.sdkService.getDeliveryItens(this.state.activeFilter)
+        this.setState({ allDeliveryItens: deliveryItens, creatingOrEditingDelivery: false, editingDeliveryId: undefined });
     }
 
     private async handleDeliveryItemDelete(deliveryItem: IDeliveryItem) {
         this.sdkService.deleteDeliveryItem(deliveryItem);
-        this.setState({ allDeliveryItens: await this.sdkService.getDeliveryItens(this.state.activeFilter) });
+        const deliveryItens = await this.sdkService.getDeliveryItens(this.state.activeFilter)
+        this.setState({ allDeliveryItens: deliveryItens });
     }
 
     private handleDeliveryItemEdit(id: string) {
