@@ -2,16 +2,19 @@ import * as SDK from 'azure-devops-extension-sdk'
 import { IAzureDevOpsService } from "../Interfaces/IAzureDevOpsService"
 import { IExtensionDataManager, IExtensionDataService, CommonServiceIds } from 'azure-devops-extension-api';
 import { getClient } from 'azure-devops-extension-api';
-import { WorkItemTrackingRestClient, WorkItemExpand, WorkItem, WorkItemRelation } from 'azure-devops-extension-api/WorkItemTracking';
+import { WorkItemTrackingRestClient, WorkItemExpand, WorkItem, WorkItemRelation, IWorkItemFormService, WorkItemTrackingServiceIds, IWorkItemFormNavigationService } from 'azure-devops-extension-api/WorkItemTracking';
 import { IDeliveryItem, IRelatedWit } from '../Interfaces/IDeliveryItem';
 import { IRelatedWitTableItem } from '../Components/DeliveryItemCard';
 import { Statuses } from 'azure-devops-ui/Components/Status/Status';
+import { IStatusProps } from 'azure-devops-ui/Status';
 
 export class AzureDevOpsSdkService implements IAzureDevOpsService {
+
 
     private COLLECTION_NAME: string = "DeliveryItemCollection";
     private _dataManager?: IExtensionDataManager;
     private _workItemTrackingClient?: WorkItemTrackingRestClient;
+    private _formService?: IWorkItemFormNavigationService;
 
     initialize(): void {
         SDK.init();
@@ -21,6 +24,8 @@ export class AzureDevOpsSdkService implements IAzureDevOpsService {
 
         const accessToken = await SDK.getAccessToken();
         const extDataService = await SDK.getService<IExtensionDataService>(CommonServiceIds.ExtensionDataService);
+        this._formService = await SDK.getService<IWorkItemFormNavigationService>(WorkItemTrackingServiceIds.WorkItemFormNavigationService);
+
         this._dataManager = await extDataService.getExtensionDataManager(SDK.getExtensionContext().id, accessToken);
         this._workItemTrackingClient = getClient(WorkItemTrackingRestClient);
     }
@@ -62,18 +67,42 @@ export class AzureDevOpsSdkService implements IAzureDevOpsService {
 
         var tasks = await this.getChildTasks(wit!);
 
+        var totalTaskWorkDone = tasks.reduce((a, b) => a + (b.fields["Simply.HorasRealizadas"] || 0), 0);
+        var totalTaskWorkPlanned = tasks.reduce((a, b) => a + (b.fields["Simply.HorasPrevistas"] || 0), 0);
+
         return Promise.resolve({
-            status: Statuses.Success,
+            status: this.getWitStatus(wit),
             id: wit.fields["System.Id"],
             title: wit.fields["System.Title"],
             effort: wit.fields["Microsoft.VSTS.Scheduling.Effort"],
             column: wit.fields["System.BoardColumn"] + (wit.fields["System.BoardColumnDone"] && " Done"),
-            totalTaskWork: "10/80",
-            todoTasksCount: 8,
-            inProgressTaskCount: 4,
-            doneTaskCount: 10
+            totalTaskWork: `${totalTaskWorkDone}/${totalTaskWorkPlanned}`,
+            todoTasksCount: tasks.filter(m => m.fields["System.State"] === "To Do").length,
+            inProgressTaskCount: tasks.filter(m => m.fields["System.State"] === "In Progress").length,
+            doneTaskCount: tasks.filter(m => m.fields["System.State"] === "Done").length
         });
 
+    }
+
+    private getWitStatus(wit: WorkItem): IStatusProps {
+        var witState = wit.fields["System.State"];
+
+        if (wit.fields["System.Tags"].includes("Impedimento"))
+            return Statuses.Warning;
+
+        switch (witState) {
+            case "New":
+                return Statuses.Waiting;
+            case "Approved":
+                return Statuses.Queued;
+            case "Commited":
+                return Statuses.Running;
+            case "Done":
+                return Statuses.Success;
+            default:
+                break;
+        }
+        return Statuses.Information;
     }
 
     async getWit(witId: number): Promise<IRelatedWit | undefined> {
@@ -88,7 +117,11 @@ export class AzureDevOpsSdkService implements IAzureDevOpsService {
         });
     }
 
-    async getChildTasks(wit: WorkItem): Promise<WorkItem[]> {
+    openWorkItem(witId: number): void {
+        this._formService?.openWorkItem(witId);
+    }
+
+    private async getChildTasks(wit: WorkItem): Promise<WorkItem[]> {
         var tasks: WorkItem[] = [];
 
         wit.relations.forEach(async (relation) => {

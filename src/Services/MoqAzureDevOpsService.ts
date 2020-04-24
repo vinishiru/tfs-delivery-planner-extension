@@ -5,6 +5,7 @@ import { IDeliveryItem, IRelatedWit } from "../Interfaces/IDeliveryItem"
 import { IRelatedWitTableItem } from "../Components/DeliveryItemCard";
 
 export class MoqAzureDevOpsService implements IAzureDevOpsService {
+    
 
     _deliveryItens: IDeliveryItem[] = [];
 
@@ -113,6 +114,10 @@ export class MoqAzureDevOpsService implements IAzureDevOpsService {
             .filter(
                 testItem => testItem.id === witId
             )[0];
+    }
+
+    openWorkItem(witId: number): void {
+        alert("WIT de id " + witId);
     }
 
 }

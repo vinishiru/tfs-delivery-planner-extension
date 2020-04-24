@@ -40,9 +40,9 @@ sizableColumns = [
     {
         id: "id",
         name: "ID",
-        width: new ObservableValue(-5),
-        renderCell: renderIdColumn,
-        onSize: onSizeSizable
+        width: 100,
+        minWidth: 100,
+        renderCell: renderIdColumn
     },
     {
         id: "title",
@@ -69,7 +69,7 @@ sizableColumns = [
     },
     {
         id: "totalTaskWork",
-        name: "Horas Realizadas/Planejadas",
+        name: "Horas Realizadas/Previstas",
         // maxWidth: 180,
         width: new ObservableValue(-15),
         renderCell: renderSimpleCell,
@@ -106,7 +106,7 @@ function renderIdColumn(
             <div className="flex-row scroll-hidden">
 
                 <Link className="fontSizeMS font-size-ms secondary-text bolt-table-link bolt-table-inline-link"
-                    onClick={() => alert("WIT de id " + tableItem.id)}>
+                    onClick={() => SdkService.openWorkItem(tableItem.id)}>
                     {tableItem.id}
                 </Link>
             </div>

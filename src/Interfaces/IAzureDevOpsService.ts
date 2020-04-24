@@ -11,4 +11,5 @@ export interface IAzureDevOpsService {
     deleteDeliveryItem(deliveryItem: IDeliveryItem): Promise<void>
     getWitDetails(witId: number): Promise<IRelatedWitTableItem | undefined>
     getWit(witId: number): Promise<IRelatedWit | undefined>
+    openWorkItem(witId: number): void
 }
