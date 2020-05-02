@@ -2,7 +2,7 @@
     "manifestVersion": 1,
     "id": "simply-delivery-planner",
     "publisher": "simply-devops",
-    "version": "1.0.35",
+    "version": "1.0.36",
     "name": "Delivery Planner",
     "description": "Azure DevOps Extension",
     "categories": [

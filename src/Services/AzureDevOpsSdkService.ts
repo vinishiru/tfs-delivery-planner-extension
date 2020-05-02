@@ -54,9 +54,10 @@ export class AzureDevOpsSdkService implements IAzureDevOpsService {
         if (collection!.length === 0)
             return await Promise.resolve(deliveryItens);
 
-        deliveryItens = collection[0].documents;
+        deliveryItens = collection[0].documents;        
         deliveryItens = deliveryItens.filter(item =>
-            item.name.includes(filter));
+            item.name.includes(filter)
+            || item.relatedWits.find(m => m.id.toString().includes(filter)));
 
         return await Promise.resolve(deliveryItens);
     }
@@ -89,7 +90,8 @@ export class AzureDevOpsSdkService implements IAzureDevOpsService {
             title: wit.fields["System.Title"],
             effort: wit.fields["Microsoft.VSTS.Scheduling.Effort"],
             column: wit.fields["System.BoardColumn"] + (wit.fields["System.BoardColumnDone"] ? " Done" : ""),
-            totalTaskWork: `${totalTaskWorkDone}/${totalTaskWorkPlanned}`,
+            totalTaskWorkDone: totalTaskWorkDone,
+            totalTaskWorkPlanned: totalTaskWorkPlanned,
             todoTasksCount: tasks.filter(m => m.fields["System.State"] === "To Do").length,
             inProgressTaskCount: tasks.filter(m => m.fields["System.State"] === "In Progress").length,
             doneTaskCount: tasks.filter(m => m.fields["System.State"] === "Done").length

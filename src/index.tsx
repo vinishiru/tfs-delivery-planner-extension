@@ -174,7 +174,7 @@ class DeliveryPlanner extends React.Component<{}, IDeliveryPlannerState> {
 
 }
 
-const SdkService = new AzureDevOpsSdkService();
+const SdkService = new MoqAzureDevOpsService();
 export default SdkService;
 
 showRootComponent(<DeliveryPlanner />);

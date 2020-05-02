@@ -5,7 +5,7 @@ import { IDeliveryItem, IRelatedWit } from "../Interfaces/IDeliveryItem"
 import { IRelatedWitTableItem } from "../Components/DeliveryItemCard";
 
 export class MoqAzureDevOpsService implements IAzureDevOpsService {
-    
+
 
     _deliveryItens: IDeliveryItem[] = [];
 
@@ -88,7 +88,8 @@ export class MoqAzureDevOpsService implements IAzureDevOpsService {
 
         if (filter)
             deliveryItens = deliveryItens.filter(item =>
-                item.name.includes(filter));
+                item.name.includes(filter)
+                || item.relatedWits.find(m => m.id.toString().includes(filter)));
 
         return deliveryItens.sort((a, b) => a.creationDate < b.creationDate ? -1 : 1);
         //return this._allDeliveryItemsMock;
@@ -102,7 +103,8 @@ export class MoqAzureDevOpsService implements IAzureDevOpsService {
             title: wit!.title,
             effort: 10,
             column: "Dev Done",
-            totalTaskWork: "10/80",
+            totalTaskWorkPlanned: 80,
+            totalTaskWorkDone: 90,
             todoTasksCount: 8,
             inProgressTaskCount: 4,
             doneTaskCount: 10

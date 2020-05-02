@@ -8,6 +8,7 @@ import { Status, StatusSize, IStatusProps } from "azure-devops-ui/Status";
 import { Link } from "azure-devops-ui/Link";
 import Skeleton from 'react-loading-skeleton';
 import ProgressBar from 'react-bootstrap/ProgressBar'
+import Badge from 'react-bootstrap/Badge'
 import * as _ from "lodash";
 
 import { IDeliveryItem } from "../Interfaces/IDeliveryItem";
@@ -25,7 +26,8 @@ export interface IRelatedWitTableItem {
     title: string;
     effort: number;
     column: string;
-    totalTaskWork: string;
+    totalTaskWorkPlanned: number;
+    totalTaskWorkDone: number;
     todoTasksCount: number;
     inProgressTaskCount: number;
     doneTaskCount: number;
@@ -72,7 +74,7 @@ sizableColumns = [
         name: "Horas Realizadas/Previstas",
         // maxWidth: 180,
         width: new ObservableValue(-15),
-        renderCell: renderSimpleCell,
+        renderCell: renderTaskWorkCell,
         onSize: onSizeSizable
     },
     {
@@ -114,6 +116,27 @@ function renderIdColumn(
     );
 }
 
+function renderTaskWorkCell(
+    rowIndex: number,
+    columnIndex: number,
+    tableColumn: ITableColumn<IRelatedWitTableItem>,
+    tableItem: IRelatedWitTableItem
+): JSX.Element {
+    const deadlineReached = tableItem.totalTaskWorkDone > tableItem.totalTaskWorkPlanned;
+    return (
+        <SimpleTableCell
+            columnIndex={columnIndex}
+            tableColumn={tableColumn}
+            key={"col-" + columnIndex}
+            contentClassName="fontWeightSemiBold font-weight-semibold fontSizeM font-size-m scroll-hidden"
+        >
+            <h5>
+                <Badge variant={deadlineReached ? "danger" : "primary"}>{tableItem.totalTaskWorkDone.toFixed(1)}/{tableItem.totalTaskWorkPlanned.toFixed(1)}</Badge>
+            </h5>
+        </SimpleTableCell>
+    );
+}
+
 function renderProgressColumn(
     rowIndex: number,
     columnIndex: number,
@@ -124,6 +147,7 @@ function renderProgressColumn(
     var totalTasks = tableItem.todoTasksCount + tableItem.inProgressTaskCount + tableItem.doneTaskCount;
     var porcentagemDone = tableItem.doneTaskCount / totalTasks * 100;
     var porcentagemInProgress = tableItem.inProgressTaskCount / totalTasks * 100;
+    var porcentagemTodo = tableItem.todoTasksCount / totalTasks * 100;
 
     return (
         <SimpleTableCell
@@ -133,8 +157,9 @@ function renderProgressColumn(
             contentClassName="fontWeightSemiBold font-weight-semibold fontSizeM font-size-m scroll-hidden"
         >
             <ProgressBar className={"flex-grow"}>
-                <ProgressBar variant="success" now={porcentagemDone} key={1} />
-                <ProgressBar animated now={porcentagemInProgress} key={2} />
+                <ProgressBar variant="success" now={porcentagemDone} label={`${tableItem.doneTaskCount} Done`} key={1} />
+                <ProgressBar animated now={porcentagemInProgress} label={`${tableItem.inProgressTaskCount} In Progress`} key={2} />
+                <ProgressBar className={"bg-secondary"} now={porcentagemTodo} label={`${tableItem.todoTasksCount} To Do`} key={3} />
             </ProgressBar>
         </SimpleTableCell>
     );
