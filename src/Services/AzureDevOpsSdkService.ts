@@ -109,7 +109,7 @@ export class AzureDevOpsSdkService implements IAzureDevOpsService {
     private getWitStatus(wit: WorkItem): IStatusProps {
         var witState = wit.fields["System.State"];
 
-        if (wit.fields["System.Tags"].includes("Impedimento"))
+        if (wit.fields["System.Tags"] && wit.fields["System.Tags"].includes("Impedimento"))
             return Statuses.Warning;
 
         switch (witState) {
