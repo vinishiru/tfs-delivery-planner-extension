@@ -54,7 +54,7 @@ export class DeliveryPanel extends React.Component<IDeliveryPanelProps, IDeliver
         if (!deliveryItem)
             return;
 
-        this._identitySelected = deliveryItem.owner && await SdkService.peoplePickerProvider.getEntityFromUniqueAttribute(deliveryItem!.owner!.identityId!);
+        this._identitySelected = deliveryItem.owner && await SdkService.peoplePickerProvider!.getEntityFromUniqueAttribute(deliveryItem!.owner!.identityId!);
 
         this.setState({
             owner: this._identitySelected ? {
@@ -96,7 +96,7 @@ export class DeliveryPanel extends React.Component<IDeliveryPanelProps, IDeliver
                             editPlaceholder={"Informe um usuário."}
                             noResultsFoundText={"Nenhum usuário encontrado."}
                             placeholder={"Informe um usuário."}
-                            pickerProvider={SdkService.peoplePickerProvider}
+                            pickerProvider={SdkService.peoplePickerProvider!}
                             value={this._identitySelected}
                         />
                     </FormItem>
