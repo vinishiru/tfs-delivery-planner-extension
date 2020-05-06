@@ -1,6 +1,6 @@
 import * as React from "react";
 import { Card } from "azure-devops-ui/Card";
-import { IHeaderCommandBarItem } from "azure-devops-ui/HeaderCommandBar";
+import { IHeaderCommandBarItem, HeaderCommandBar } from "azure-devops-ui/HeaderCommandBar";
 import { SimpleTableCell, renderSimpleCell, Table, ITableColumn } from "azure-devops-ui/Table";
 import { ObservableValue } from "azure-devops-ui/Core/Observable";
 import { ArrayItemProvider } from "azure-devops-ui/Utilities/Provider";
@@ -16,6 +16,7 @@ import { DeliveryItemDeleteDialog } from "./DeliveryItemDeleteDialog";
 
 
 import SdkService from "../index"
+import { CustomHeader, HeaderTitleArea, HeaderTitleRow, HeaderTitle, HeaderIcon, TitleSize, HeaderDescription } from "azure-devops-ui/Header";
 
 const Fade = require('react-reveal/Fade');
 
@@ -79,7 +80,7 @@ sizableColumns = [
     },
     {
         id: "progress",
-        name: "Progresso",
+        name: "Progresso de Tasks",
         // maxWidth: 300,
         width: new ObservableValue(-20),
         renderCell: renderProgressColumn,
@@ -207,6 +208,7 @@ export class DeliveryItemCard extends React.Component<IDeliveryItemCardProps, ID
             <div>
                 <Fade left distance={"5%"}>
                     <Card
+                        renderHeader={() => this.renderCardHeader(this.state.deliveryItem)}
                         className="flex-grow bolt-table-card"
                         titleProps={{ text: this.state.deliveryItem.name }}
                         headerCommandBarItems={this.commandBarItems(this.state.deliveryItem)}
@@ -243,7 +245,29 @@ export class DeliveryItemCard extends React.Component<IDeliveryItemCardProps, ID
         );
     }
 
-
+    private renderCardHeader(deliveryItem: IDeliveryItem): JSX.Element {
+        return (
+            <CustomHeader className="bolt-header-with-commandbar">
+                {/* <HeaderIcon
+                    className="bolt-table-status-icon-large"
+                    iconProps={{ render: this.renderStatus }}
+                    titleSize={TitleSize.Large}
+                /> */}
+                <HeaderTitleArea>
+                    <HeaderTitleRow>
+                        <HeaderTitle className="text-ellipsis" titleSize={TitleSize.Large}>
+                            {deliveryItem.name}
+                        </HeaderTitle>
+                        {deliveryItem.owner && <div>{deliveryItem.owner.displayName!}</div>}
+                    </HeaderTitleRow>
+                    <HeaderDescription>
+                        {deliveryItem.description}
+                    </HeaderDescription>
+                </HeaderTitleArea>
+                <HeaderCommandBar items={this.commandBarItems(this.state.deliveryItem)} />
+            </CustomHeader>
+        );
+    }
 
     private async loadDeliveryTableItemInfo(): Promise<void> {
         if (this.state.deliveryItem.relatedWits) {

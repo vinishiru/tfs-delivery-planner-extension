@@ -1,4 +1,5 @@
 export interface IDeliveryItem {
+    owner?: IIdentity,
     id: string,
     name: string,
     description: string,
@@ -9,4 +10,9 @@ export interface IDeliveryItem {
 export interface IRelatedWit {
     id: number,
     title: string
+}
+
+export interface IIdentity {
+    identityId: string,
+    displayName: string
 }

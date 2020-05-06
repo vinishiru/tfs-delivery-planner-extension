@@ -3,8 +3,9 @@ import * as React from "react";
 import { Panel } from "azure-devops-ui/Panel";
 import { FormItem } from "azure-devops-ui/FormItem";
 import { TextField, TextFieldWidth } from "azure-devops-ui/TextField";
+import { IdentityPickerDropdown } from "azure-devops-ui/IdentityPicker";
 
-import { IDeliveryItem, IRelatedWit } from "../Interfaces/IDeliveryItem";
+import { IDeliveryItem, IRelatedWit, IIdentity } from "../Interfaces/IDeliveryItem";
 import { WorkItemPicker } from "./WorkItemPicker";
 import SdkService from "..";
 
@@ -15,6 +16,7 @@ interface IDeliveryPanelProps {
 }
 
 interface IDeliveryPanelState {
+    owner?: IIdentity;
     deliveryId?: string;
     name?: string;
     description?: string;
@@ -28,12 +30,15 @@ interface IDeliveryPanelState {
 
 export class DeliveryPanel extends React.Component<IDeliveryPanelProps, IDeliveryPanelState> {
 
+    private _identitySelected?: import("azure-devops-ui/IdentityPicker").IIdentity;
+
     constructor(props: IDeliveryPanelProps) {
         super(props);
 
         this.state = { nameError: false, descriptionError: false, relatedWitError: false };
 
         this.handleUpdatedRelatedWits = this.handleUpdatedRelatedWits.bind(this);
+        this.handleOwnerChange = this.handleOwnerChange.bind(this);
         this.handleDismiss = this.handleDismiss.bind(this);
         this.handleSave = this.handleSave.bind(this);
     }
@@ -45,13 +50,23 @@ export class DeliveryPanel extends React.Component<IDeliveryPanelProps, IDeliver
 
         var deliveryItem = await SdkService.getDeliveryItem(this.props.deliveryId!);
 
-        if (deliveryItem)
-            this.setState({
-                name: deliveryItem.name,
-                description: deliveryItem.description,
-                relatedWits: deliveryItem.relatedWits,
-                creationDate: deliveryItem.creationDate
-            });
+
+        if (!deliveryItem)
+            return;
+
+        this._identitySelected = deliveryItem.owner && await SdkService.peoplePickerProvider.getEntityFromUniqueAttribute(deliveryItem!.owner!.identityId!);
+
+        this.setState({
+            owner: this._identitySelected ? {
+                displayName: this._identitySelected.displayName!,
+                identityId: this._identitySelected.entityId,
+            } : undefined,
+            name: deliveryItem.name,
+            description: deliveryItem.description,
+            relatedWits: deliveryItem.relatedWits,
+            creationDate: deliveryItem.creationDate
+        });
+
     }
 
     public render(): JSX.Element {
@@ -72,6 +87,20 @@ export class DeliveryPanel extends React.Component<IDeliveryPanelProps, IDeliver
                     }
                 ]}>
                 <div className="flex-column rhythm-vertical-16">
+
+                    <FormItem
+                        label={"Responsável:"}
+                    >
+                        <IdentityPickerDropdown
+                            onChange={(item) => this.handleOwnerChange(item)}
+                            editPlaceholder={"Informe um usuário."}
+                            noResultsFoundText={"Nenhum usuário encontrado."}
+                            placeholder={"Informe um usuário."}
+                            pickerProvider={SdkService.peoplePickerProvider}
+                            value={this._identitySelected}
+                        />
+                    </FormItem>
+
                     <FormItem
                         label={"Nome da entrega:"}
                         error={this.state.nameError}
@@ -111,6 +140,13 @@ export class DeliveryPanel extends React.Component<IDeliveryPanelProps, IDeliver
         );
     }
 
+    private handleOwnerChange(item: import("azure-devops-ui/IdentityPicker").IIdentity | undefined) {
+        if (!item)
+            return;
+
+        this.setState({ owner: { displayName: item!.displayName!, identityId: item!.entityId } });
+    }
+
     private handleUpdatedRelatedWits(relatedWits: IRelatedWit[]) {
         this.setState({ relatedWits: relatedWits });
     }
@@ -144,7 +180,8 @@ export class DeliveryPanel extends React.Component<IDeliveryPanelProps, IDeliver
             creationDate: this.state.creationDate! || new Date(),
             name: this.state.name!,
             description: this.state.description!,
-            relatedWits: this.state.relatedWits!
+            relatedWits: this.state.relatedWits!,
+            owner: this.state.owner
         };
         await this.props.onSave(deliveryItem);
     }

@@ -1,6 +1,7 @@
 import * as SDK from 'azure-devops-extension-sdk'
 import { IAzureDevOpsService } from "../Interfaces/IAzureDevOpsService"
-import { IExtensionDataManager, IExtensionDataService, CommonServiceIds, ILocationService, IProjectPageService } from 'azure-devops-extension-api';
+import { IExtensionDataManager, IExtensionDataService, CommonServiceIds, IProjectPageService } from 'azure-devops-extension-api';
+import { PeoplePickerProvider } from 'azure-devops-extension-api/Identities'
 import { getClient } from 'azure-devops-extension-api';
 import { WorkItemTrackingRestClient, WorkItemExpand, WorkItem, WorkItemRelation, WorkItemTrackingServiceIds, IWorkItemFormNavigationService } from 'azure-devops-extension-api/WorkItemTracking';
 import { IDeliveryItem, IRelatedWit } from '../Interfaces/IDeliveryItem';
@@ -10,13 +11,14 @@ import { IStatusProps } from 'azure-devops-ui/Status';
 import _ from 'lodash';
 
 export class AzureDevOpsSdkService implements IAzureDevOpsService {
-
+    peoplePickerProvider?: import("azure-devops-ui/IdentityPicker").IPeoplePickerProvider;
 
     private COLLECTION_NAME: string = "DeliveryItemCollection";
     private _dataManager?: IExtensionDataManager;
     private _workItemTrackingClient?: WorkItemTrackingRestClient;
     private _formService?: IWorkItemFormNavigationService;
     private _projectService?: IProjectPageService;
+    // private _identitiesService?: IVssIdentityService;
 
     initialize(): void {
         SDK.init();
@@ -27,8 +29,9 @@ export class AzureDevOpsSdkService implements IAzureDevOpsService {
         const accessToken = await SDK.getAccessToken();
         const extDataService = await SDK.getService<IExtensionDataService>(CommonServiceIds.ExtensionDataService);
         this._formService = await SDK.getService<IWorkItemFormNavigationService>(WorkItemTrackingServiceIds.WorkItemFormNavigationService);
-
         this._projectService = await SDK.getService<IProjectPageService>(CommonServiceIds.ProjectPageService);
+        // this._identitiesService = await SDK.getService<IVssIdentityService>(IdentityServiceIds.IdentityService);
+        this.peoplePickerProvider = new PeoplePickerProvider();
 
         const project = await this._projectService.getProject();
         this.COLLECTION_NAME += project!.name;
@@ -54,7 +57,7 @@ export class AzureDevOpsSdkService implements IAzureDevOpsService {
         if (collection!.length === 0)
             return await Promise.resolve(deliveryItens);
 
-        deliveryItens = collection[0].documents;        
+        deliveryItens = collection[0].documents;
         deliveryItens = deliveryItens.filter(item =>
             item.name.includes(filter)
             || item.relatedWits.find(m => m.id.toString().includes(filter)));

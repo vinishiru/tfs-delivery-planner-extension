@@ -3,12 +3,59 @@ import { Statuses } from "azure-devops-ui/Status";
 import { IAzureDevOpsService } from "../Interfaces/IAzureDevOpsService"
 import { IDeliveryItem, IRelatedWit } from "../Interfaces/IDeliveryItem"
 import { IRelatedWitTableItem } from "../Components/DeliveryItemCard";
+import { IPeoplePickerProvider, IPersonaConnections, IIdentity } from "azure-devops-ui/IdentityPicker";
+
+class MoqPeoplePickerProvider implements IPeoplePickerProvider {
+
+    private _identities: IIdentity[] = [{
+        entityId: "123",
+        entityType: "user",
+        originDirectory: "",
+        originId: "",
+        displayName: "Vinícius Oliveira"
+    },
+    {
+        entityId: "456",
+        entityType: "user",
+        originDirectory: "",
+        originId: "",
+        displayName: "Ana Rita"
+    },
+    {
+        entityId: "789",
+        entityType: "user",
+        originDirectory: "",
+        originId: "",
+        displayName: "Ivo Pereira"
+    }];
+
+    addIdentitiesToMRU?: ((identities: IIdentity[]) => Promise<boolean>) | undefined
+
+    onFilterIdentities: (filter: string, selectedItems?: IIdentity[] | undefined) => IIdentity[] | PromiseLike<IIdentity[]> | null =
+        (filter: string, selectedItems?: IIdentity[] | undefined) => {
+            return this._identities.filter(m => m.displayName!.includes(filter));
+        };
+
+    onEmptyInputFocus?: (() => IIdentity[] | PromiseLike<IIdentity[]> | null) | undefined;
+
+    onRequestConnectionInformation: (entity: IIdentity, getDirectReports?: boolean | undefined) => IPersonaConnections | PromiseLike<IPersonaConnections> =
+        (entity: IIdentity, getDirectReports?: boolean | undefined) => {
+            return {};
+        };
+
+    getEntityFromUniqueAttribute: (entityId: string) => IIdentity | PromiseLike<IIdentity> =
+        (entityId: string) => {
+            return this._identities.find(m => m.entityId === entityId)!;
+        };
+
+    removeIdentitiesFromMRU?: ((identities: IIdentity[]) => Promise<boolean>) | undefined;
+}
 
 export class MoqAzureDevOpsService implements IAzureDevOpsService {
 
+    peoplePickerProvider: IPeoplePickerProvider = new MoqPeoplePickerProvider();
 
     _deliveryItens: IDeliveryItem[] = [];
-
     _allDeliveryItemsMock: IDeliveryItem[] = [
         {
             id: "123456",
