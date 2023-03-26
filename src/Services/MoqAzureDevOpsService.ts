@@ -2,7 +2,7 @@ import { Statuses } from "azure-devops-ui/Status";
 
 import { IAzureDevOpsService } from "../Interfaces/IAzureDevOpsService"
 import { IDeliveryItem, IRelatedWit } from "../Interfaces/IDeliveryItem"
-import { IRelatedWitTableItem } from "../Components/DeliveryItemCard";
+import { IRelatedWitTableItem, IRelatedWitTaskTableItem } from "../Components/DeliveryItemCard";
 import { IPeoplePickerProvider, IPersonaConnections, IIdentity } from "azure-devops-ui/IdentityPicker";
 
 class MoqPeoplePickerProvider implements IPeoplePickerProvider {
@@ -53,6 +53,7 @@ class MoqPeoplePickerProvider implements IPeoplePickerProvider {
 
 export class MoqAzureDevOpsService implements IAzureDevOpsService {
 
+
     peoplePickerProvider: IPeoplePickerProvider = new MoqPeoplePickerProvider();
 
     _deliveryItens: IDeliveryItem[] = [];
@@ -64,11 +65,11 @@ export class MoqAzureDevOpsService implements IAzureDevOpsService {
             description: "Entrega do Projeto A",
             relatedWits: [
                 {
-                    id: 1,
+                    id: 40123,
                     title: "PBI A"
                 },
                 {
-                    id: 2,
+                    id: 40456,
                     title: "PBI XPTO"
                 }
             ]
@@ -78,7 +79,7 @@ export class MoqAzureDevOpsService implements IAzureDevOpsService {
             name: "Projeto B",
             creationDate: new Date(),
             description: "Entrega do Projeto B",
-            relatedWits: [{ id: 2, title: "PBI B" }]
+            relatedWits: [{ id: 40789, title: "PBI B" }]
         }
     ];
 
@@ -131,15 +132,15 @@ export class MoqAzureDevOpsService implements IAzureDevOpsService {
     }
 
     async getDeliveryItens(filter?: string): Promise<IDeliveryItem[]> {
-        let deliveryItens = this._deliveryItens;
+        // let deliveryItens = this._deliveryItens;
 
-        if (filter)
-            deliveryItens = deliveryItens.filter(item =>
-                item.name.includes(filter)
-                || item.relatedWits.find(m => m.id.toString().includes(filter)));
+        // if (filter)
+        //     deliveryItens = deliveryItens.filter(item =>
+        //         item.name.includes(filter)
+        //         || item.relatedWits.find(m => m.id.toString().includes(filter)));
 
-        return deliveryItens.sort((a, b) => a.creationDate < b.creationDate ? -1 : 1);
-        //return this._allDeliveryItemsMock;
+        // return deliveryItens.sort((a, b) => a.creationDate < b.creationDate ? -1 : 1);
+        return this._allDeliveryItemsMock;
     }
 
     async getWitDetails(witId: number): Promise<IRelatedWitTableItem> {
@@ -152,9 +153,30 @@ export class MoqAzureDevOpsService implements IAzureDevOpsService {
             column: "Dev Done",
             totalTaskWorkPlanned: 80,
             totalTaskWorkDone: 90,
+            totalTaskWorkLeft: 10,
             todoTasksCount: 8,
             inProgressTaskCount: 4,
-            doneTaskCount: 10
+            doneTaskCount: 10,
+            tasks: [
+                {
+                    status: Statuses.Waiting,
+                    column: "To Do",
+                    id: 1234,
+                    title: "Implementação do Front",
+                    workDone: 10,
+                    workPlanned: 40,
+                    workLeft: 30
+                },
+                {
+                    status: Statuses.Success,
+                    column: "Done",
+                    id: 1234,
+                    title: "Implementação do Back",
+                    workDone: 45,
+                    workPlanned: 40,
+                    workLeft: 0
+                }
+            ]
         });
     }
 

@@ -1,5 +1,5 @@
 import { IDeliveryItem, IRelatedWit } from "./IDeliveryItem";
-import { IRelatedWitTableItem } from "../Components/DeliveryItemCard";
+import { IRelatedWitTableItem, IRelatedWitTaskTableItem } from "../Components/DeliveryItemCard";
 import { IPeoplePickerProvider } from "azure-devops-ui/IdentityPicker";
 
 export interface IAzureDevOpsService {

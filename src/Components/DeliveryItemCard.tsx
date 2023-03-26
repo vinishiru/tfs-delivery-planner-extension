@@ -1,7 +1,7 @@
 import * as React from "react";
 import { Card } from "azure-devops-ui/Card";
 import { IHeaderCommandBarItem, HeaderCommandBar } from "azure-devops-ui/HeaderCommandBar";
-import { SimpleTableCell, renderSimpleCell, Table, ITableColumn } from "azure-devops-ui/Table";
+import { SimpleTableCell, renderSimpleCell, Table, ITableColumn, ITableRowDetails, ITableRow } from "azure-devops-ui/Table";
 import { ObservableValue } from "azure-devops-ui/Core/Observable";
 import { ArrayItemProvider } from "azure-devops-ui/Utilities/Provider";
 import { Status, StatusSize, IStatusProps } from "azure-devops-ui/Status";
@@ -16,7 +16,8 @@ import { DeliveryItemDeleteDialog } from "./DeliveryItemDeleteDialog";
 
 
 import SdkService from "../index"
-import { CustomHeader, HeaderTitleArea, HeaderTitleRow, HeaderTitle, HeaderIcon, TitleSize, HeaderDescription } from "azure-devops-ui/Header";
+import { CustomHeader, HeaderTitleArea, HeaderTitleRow, HeaderTitle, TitleSize, HeaderDescription, Header } from "azure-devops-ui/Header";
+import { DeliveryItemCardTableRow } from "./DeliveryItemCardTableRow";
 
 const Fade = require('react-reveal/Fade');
 
@@ -29,17 +30,36 @@ export interface IRelatedWitTableItem {
     column: string;
     totalTaskWorkPlanned: number;
     totalTaskWorkDone: number;
+    totalTaskWorkLeft: number;
     todoTasksCount: number;
     inProgressTaskCount: number;
     doneTaskCount: number;
+    tasks?: IRelatedWitTaskTableItem[];
 }
 
-function onSizeSizable(event: MouseEvent, index: number, width: number) {
+export interface IRelatedWitTaskTableItem {
+    status: IStatusProps;
+    id: number;
+    title: string;
+    column: string;
+    workPlanned: number;
+    workDone: number;
+    workLeft: number;
+}
+
+export interface ITableItemSummary {
+    totalWits: number;
+    totalTasks: number;
+    totalWorkPlanned: number;
+    totalWorkDone: number;
+    totalWorkLeft: number;
+}
+
+export function onSizeSizable(event: MouseEvent, index: number, width: number) {
     (sizableColumns[index].width as ObservableValue<number>).value = width;
 }
 
-let sizableColumns: ITableColumn<any>[];
-sizableColumns = [
+export let sizableColumns: ITableColumn<any>[] = [
     {
         id: "id",
         name: "ID",
@@ -72,7 +92,7 @@ sizableColumns = [
     },
     {
         id: "totalTaskWork",
-        name: "Horas Realizadas/Previstas",
+        name: "Horas Realizadas/Previstas/Restando",
         // maxWidth: 180,
         width: new ObservableValue(-15),
         renderCell: renderTaskWorkCell,
@@ -87,6 +107,64 @@ sizableColumns = [
         onSize: onSizeSizable
     }
 ];
+
+export let summaryColumns: ITableColumn<any>[] = [
+    {
+        id: "totalWits",
+        name: "Total de Work Itens",
+        width: new ObservableValue(-20),
+        renderCell: renderBoldCell,
+        onSize: onSizeSizable
+    },
+    {
+        id: "totalTasks",
+        name: "Total de Tasks",
+        width: new ObservableValue(-20),
+        renderCell: renderBoldCell,
+        onSize: onSizeSizable
+    },
+    {
+        id: "totalWorkPlanned",
+        name: "Total Horas Planejadas",
+        width: new ObservableValue(-20),
+        renderCell: renderBoldCell,
+        onSize: onSizeSizable
+    },
+    {
+        id: "totalWorkDone",
+        name: "Total Horas Realizadas",
+        // maxWidth: 100,
+        width: new ObservableValue(-20),
+        renderCell: renderBoldCell,
+        onSize: onSizeSizable
+    },
+    {
+        id: "totalWorkLeft",
+        name: "Total Horas Restando",
+        // maxWidth: 300,
+        width: new ObservableValue(-20),
+        renderCell: renderBoldCell,
+        onSize: onSizeSizable
+    }
+];
+
+function renderBoldCell(
+    rowIndex: number,
+    columnIndex: number,
+    tableColumn: ITableColumn<ITableItemSummary>,
+    tableItem: any
+): JSX.Element {
+    return (
+        <SimpleTableCell
+            columnIndex={columnIndex}
+            tableColumn={tableColumn}
+            key={"col-" + columnIndex}
+            contentClassName="font-weight-semibold font-size-l scroll-hidden"
+        >
+            {tableItem[tableColumn.id]}
+        </SimpleTableCell>
+    );
+}
 
 function renderIdColumn(
     rowIndex: number,
@@ -132,7 +210,7 @@ function renderTaskWorkCell(
             contentClassName="fontWeightSemiBold font-weight-semibold fontSizeM font-size-m scroll-hidden"
         >
             <h5>
-                <Badge variant={deadlineReached ? "danger" : "primary"}>{tableItem.totalTaskWorkDone.toFixed(1)}/{tableItem.totalTaskWorkPlanned.toFixed(1)}</Badge>
+                <Badge variant={deadlineReached ? "danger" : "primary"}>{tableItem.totalTaskWorkDone.toFixed(1)}/{tableItem.totalTaskWorkPlanned.toFixed(1)}/{tableItem.totalTaskWorkLeft.toFixed(1)}</Badge>
             </h5>
         </SimpleTableCell>
     );
@@ -178,17 +256,20 @@ interface IDeliveryItemCardState {
     deliveryItem: IDeliveryItem;
     isDeleting: boolean;
     relatedWitLoaded: boolean;
+    activatedRowsIndexes: number[];
 }
 
 export class DeliveryItemCard extends React.Component<IDeliveryItemCardProps, IDeliveryItemCardState> {
 
     deliveryTableItens: ArrayItemProvider<IRelatedWitTableItem | undefined>;
+    summaryTableItem: ArrayItemProvider<ITableItemSummary>;
 
     constructor(props: IDeliveryItemCardProps) {
         super(props);
 
-        this.state = { deliveryItem: props.deliveryItem, isDeleting: false, relatedWitLoaded: false };
+        this.state = { deliveryItem: props.deliveryItem, isDeleting: false, relatedWitLoaded: false, activatedRowsIndexes: [] };
         this.deliveryTableItens = new ArrayItemProvider<IRelatedWitTableItem>([]);
+        this.summaryTableItem = new ArrayItemProvider<ITableItemSummary>([]);
     }
 
     public async componentDidMount() {
@@ -215,10 +296,23 @@ export class DeliveryItemCard extends React.Component<IDeliveryItemCardProps, ID
                     >
                         {this.state.relatedWitLoaded &&
                             (
-                                <Table<Partial<IRelatedWitTableItem | undefined>>
-                                    columns={sizableColumns}
-                                    itemProvider={this.deliveryTableItens}
-                                />
+                                <React.Fragment>
+                                    <div className="flex-column">
+                                        <Table<Partial<IRelatedWitTableItem | undefined>>
+                                            columns={sizableColumns}
+                                            itemProvider={this.deliveryTableItens}
+                                            renderRow={(rowIndex, item, rowDetails) => this.renderTableRow(rowIndex, item, rowDetails)}
+                                        // onSelect={(event, row) => this.onRowClicked(row)}
+                                        />
+                                        <Table<ITableItemSummary>
+                                            columns={summaryColumns}
+                                            itemProvider={this.summaryTableItem}
+                                            role="table"
+                                            className="table-example"
+                                            containerClassName="h-scroll-auto"
+                                        />
+                                    </div>
+                                </React.Fragment>
                             )}
 
                         {!this.state.relatedWitLoaded && this.state.deliveryItem.relatedWits &&
@@ -242,6 +336,30 @@ export class DeliveryItemCard extends React.Component<IDeliveryItemCardProps, ID
                             }} />
                     )}
             </div>
+        );
+    }
+
+    private onRowClicked(row: ITableRow<Partial<IRelatedWitTableItem | undefined>>) {
+        const indexOfRow = this.state.activatedRowsIndexes.indexOf(row.index);
+        var newArray = this.state.activatedRowsIndexes.slice();
+        if (indexOfRow !== -1) {
+            newArray.splice(indexOfRow, 1);
+        }
+        else {
+            newArray.push(row.index);
+        }
+        this.setState({ activatedRowsIndexes: newArray });
+    }
+
+    private renderTableRow(rowIndex: number, item: Partial<IRelatedWitTableItem | undefined>, rowDetails: ITableRowDetails<any>): JSX.Element {
+        return (
+            <DeliveryItemCardTableRow
+                key={item!.id}
+                rowDetails={rowDetails}
+                rowIndex={rowIndex}
+                item={item}
+                isActivated={this.state.activatedRowsIndexes.includes(rowIndex)}
+            />
         );
     }
 
@@ -274,6 +392,15 @@ export class DeliveryItemCard extends React.Component<IDeliveryItemCardProps, ID
             this.setState({ relatedWitLoaded: false });
             const witArray = await Promise.all(this.state.deliveryItem.relatedWits.map(wit => SdkService.getWitDetails(wit.id)));
             this.deliveryTableItens = new ArrayItemProvider<IRelatedWitTableItem | undefined>(witArray);
+            this.summaryTableItem = new ArrayItemProvider<ITableItemSummary>([
+                {
+                    totalWits: witArray.length,
+                    totalTasks: witArray.map(m => m.tasks!.length! || 0).reduce((acc, curr) => acc + curr),
+                    totalWorkDone: witArray.map(m => m.totalTaskWorkDone).reduce((acc, curr) => acc + curr),
+                    totalWorkLeft: witArray.map(m => m.totalTaskWorkPlanned).reduce((acc, curr) => acc + curr),
+                    totalWorkPlanned: witArray.map(m => m.totalTaskWorkPlanned).reduce((acc, curr) => acc + curr)
+                }
+            ]);
             this.setState({ relatedWitLoaded: true });
         }
         else

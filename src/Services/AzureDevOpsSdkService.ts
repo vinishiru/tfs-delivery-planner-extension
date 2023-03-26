@@ -5,7 +5,7 @@ import { PeoplePickerProvider } from 'azure-devops-extension-api/Identities'
 import { getClient } from 'azure-devops-extension-api';
 import { WorkItemTrackingRestClient, WorkItemExpand, WorkItem, WorkItemRelation, WorkItemTrackingServiceIds, IWorkItemFormNavigationService } from 'azure-devops-extension-api/WorkItemTracking';
 import { IDeliveryItem, IRelatedWit } from '../Interfaces/IDeliveryItem';
-import { IRelatedWitTableItem } from '../Components/DeliveryItemCard';
+import { IRelatedWitTableItem, IRelatedWitTaskTableItem } from '../Components/DeliveryItemCard';
 import { Statuses } from 'azure-devops-ui/Components/Status/Status';
 import { IStatusProps } from 'azure-devops-ui/Status';
 import _ from 'lodash';
@@ -84,8 +84,7 @@ export class AzureDevOpsSdkService implements IAzureDevOpsService {
 
         var totalTaskWorkDone = tasks.reduce((a, b) => a + (b.fields["Simply.HorasRealizadas"] || 0), 0);
         var totalTaskWorkPlanned = tasks.reduce((a, b) => a + (b.fields["Simply.HorasPrevistas"] || 0), 0);
-
-        console.log(`${totalTaskWorkDone}/${totalTaskWorkPlanned}`);
+        var totalTaskWorkLeft = tasks.reduce((a, b) => a + (b.fields["Microsoft.VSTS.Scheduling.RemainingWork"] || 0), 0);
 
         var relatedWitTableItem: IRelatedWitTableItem = {
             status: this.getWitStatus(wit),
@@ -95,15 +94,30 @@ export class AzureDevOpsSdkService implements IAzureDevOpsService {
             column: wit.fields["System.BoardColumn"] + (wit.fields["System.BoardColumnDone"] ? " Done" : ""),
             totalTaskWorkDone: totalTaskWorkDone,
             totalTaskWorkPlanned: totalTaskWorkPlanned,
+            totalTaskWorkLeft: totalTaskWorkLeft,
             todoTasksCount: tasks.filter(m => m.fields["System.State"] === "To Do").length,
             inProgressTaskCount: tasks.filter(m => m.fields["System.State"] === "In Progress").length,
-            doneTaskCount: tasks.filter(m => m.fields["System.State"] === "Done").length
+            doneTaskCount: tasks.filter(m => m.fields["System.State"] === "Done").length,
+            tasks: this.getTasksItems(tasks)
         };
-
         console.log(relatedWitTableItem);
-
         return await Promise.resolve(relatedWitTableItem);
+    }
+    private getTasksItems(tasks: WorkItem[]): IRelatedWitTaskTableItem[] | undefined {
+        if (!tasks)
+            return [];
 
+        return tasks.map(wit => {
+            return {
+                status: this.getWitStatus(wit),
+                id: wit.fields["System.Id"],
+                title: wit.fields["System.Title"],
+                column: wit.fields["System.BoardColumn"],
+                workPlanned: wit.fields["Simply.HorasPrevistas"],
+                workDone: wit.fields["Simply.HorasRealizadas"],
+                workLeft: wit.fields["Microsoft.VSTS.Scheduling.RemainingWork"]
+            };
+        });
     }
 
     private getWitStatus(wit: WorkItem): IStatusProps {
