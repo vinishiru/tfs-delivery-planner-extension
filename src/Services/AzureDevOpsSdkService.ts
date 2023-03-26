@@ -112,10 +112,10 @@ export class AzureDevOpsSdkService implements IAzureDevOpsService {
                 status: this.getWitStatus(wit),
                 id: wit.fields["System.Id"],
                 title: wit.fields["System.Title"],
-                column: wit.fields["System.BoardColumn"],
-                workPlanned: wit.fields["Simply.HorasPrevistas"],
-                workDone: wit.fields["Simply.HorasRealizadas"],
-                workLeft: wit.fields["Microsoft.VSTS.Scheduling.RemainingWork"]
+                column: wit.fields["System.State"],
+                workPlanned: wit.fields["Simply.HorasPrevistas"] || 0,
+                workDone: wit.fields["Simply.HorasRealizadas"] || 0,
+                workLeft: wit.fields["Microsoft.VSTS.Scheduling.RemainingWork"] || 0
             };
         });
     }
@@ -130,8 +130,10 @@ export class AzureDevOpsSdkService implements IAzureDevOpsService {
             case "New":
                 return Statuses.Queued;
             case "Approved":
+            case "To Do":
                 return Statuses.Waiting;
             case "Commited":
+            case "In Progress":
                 return Statuses.Running;
             case "Done":
                 return Statuses.Success;

@@ -395,10 +395,10 @@ export class DeliveryItemCard extends React.Component<IDeliveryItemCardProps, ID
             this.summaryTableItem = new ArrayItemProvider<ITableItemSummary>([
                 {
                     totalWits: witArray.length,
-                    totalTasks: witArray.map(m => m.tasks!.length! || 0).reduce((acc, curr) => acc + curr),
-                    totalWorkDone: witArray.map(m => m.totalTaskWorkDone).reduce((acc, curr) => acc + curr),
-                    totalWorkLeft: witArray.map(m => m.totalTaskWorkPlanned).reduce((acc, curr) => acc + curr),
-                    totalWorkPlanned: witArray.map(m => m.totalTaskWorkPlanned).reduce((acc, curr) => acc + curr)
+                    totalTasks: witArray.map(m => m!.tasks!.length || 0).reduce((acc, curr) => acc + curr),
+                    totalWorkDone: witArray.map(m => m!.totalTaskWorkDone || 0).reduce((acc, curr) => acc + curr),
+                    totalWorkLeft: witArray.map(m => m!.totalTaskWorkLeft || 0).reduce((acc, curr) => acc + curr),
+                    totalWorkPlanned: witArray.map(m => m!.totalTaskWorkPlanned || 0).reduce((acc, curr) => acc + curr)
                 }
             ]);
             this.setState({ relatedWitLoaded: true });
