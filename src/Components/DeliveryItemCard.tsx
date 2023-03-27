@@ -154,6 +154,7 @@ function renderBoldCell(
     tableColumn: ITableColumn<ITableItemSummary>,
     tableItem: any
 ): JSX.Element {
+    const value = parseFloat(tableItem[tableColumn.id] || 0);
     return (
         <SimpleTableCell
             columnIndex={columnIndex}
@@ -161,7 +162,7 @@ function renderBoldCell(
             key={"col-" + columnIndex}
             contentClassName="font-weight-semibold font-size-l scroll-hidden"
         >
-            {tableItem[tableColumn.id]}
+            {value.toFixed(1)}
         </SimpleTableCell>
     );
 }
@@ -358,6 +359,7 @@ export class DeliveryItemCard extends React.Component<IDeliveryItemCardProps, ID
                 rowDetails={rowDetails}
                 rowIndex={rowIndex}
                 item={item}
+                deliveryItemId={this.props.deliveryItem.id}
                 isActivated={this.state.activatedRowsIndexes.includes(rowIndex)}
             />
         );

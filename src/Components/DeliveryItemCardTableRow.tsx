@@ -16,6 +16,7 @@ export interface IDeliveryItemCardTableRowProps {
     rowIndex: number;
     item: Partial<IRelatedWitTableItem | undefined>;
     isActivated: boolean;
+    deliveryItemId: string;
 }
 export interface IDeliveryItemCardTableRowState {
     isActivated: boolean;
@@ -118,7 +119,7 @@ export class DeliveryItemCardTableRow extends React.Component<IDeliveryItemCardT
     constructor(props: IDeliveryItemCardTableRowProps) {
         super(props);
         this.state = { isActivated: false };
-        this.classIndexer = "table-row-" + props.item!.id!;
+        this.classIndexer = "table-row-" + props.item!.id! + "-" + props.deliveryItemId;
         this.relatedTasks = new ArrayItemProvider<IRelatedWitTaskTableItem>(props.item!.tasks!);
     }
 
