@@ -3,12 +3,11 @@ import { Card } from "azure-devops-ui/Card";
 import { IHeaderCommandBarItem, HeaderCommandBar } from "azure-devops-ui/HeaderCommandBar";
 import { SimpleTableCell, renderSimpleCell, Table, ITableColumn, ITableRowDetails, ITableRow } from "azure-devops-ui/Table";
 import { ObservableValue } from "azure-devops-ui/Core/Observable";
+import { ProgressBar } from "azure-devops-ui/Components/ProgressBar/ProgressBar";
 import { ArrayItemProvider } from "azure-devops-ui/Utilities/Provider";
 import { Status, StatusSize, IStatusProps } from "azure-devops-ui/Status";
 import { Link } from "azure-devops-ui/Link";
 import Skeleton from 'react-loading-skeleton';
-import ProgressBar from 'react-bootstrap/ProgressBar'
-import Badge from 'react-bootstrap/Badge'
 import * as _ from "lodash";
 
 import { IDeliveryItem } from "../Interfaces/IDeliveryItem";
@@ -18,6 +17,8 @@ import { DeliveryItemDeleteDialog } from "./DeliveryItemDeleteDialog";
 import SdkService from "../index"
 import { CustomHeader, HeaderTitleArea, HeaderTitleRow, HeaderTitle, TitleSize, HeaderDescription, Header } from "azure-devops-ui/Header";
 import { DeliveryItemCardTableRow } from "./DeliveryItemCardTableRow";
+import { Pill } from "azure-devops-ui/Components/Pill/Pill";
+import { PillSize, PillVariant } from "azure-devops-ui/Components/Pill/Pill.Props";
 
 const Fade = require('react-reveal/Fade');
 
@@ -203,6 +204,7 @@ function renderTaskWorkCell(
     tableItem: IRelatedWitTableItem
 ): JSX.Element {
     const deadlineReached = tableItem.totalTaskWorkDone > tableItem.totalTaskWorkPlanned;
+    const pillClass = deadlineReached ? 'pill-danger' : 'pill-default';
     return (
         <SimpleTableCell
             columnIndex={columnIndex}
@@ -210,9 +212,7 @@ function renderTaskWorkCell(
             key={"col-" + columnIndex}
             contentClassName="fontWeightSemiBold font-weight-semibold fontSizeM font-size-m scroll-hidden"
         >
-            <h5>
-                <Badge variant={deadlineReached ? "danger" : "primary"}>{tableItem.totalTaskWorkDone.toFixed(1)}/{tableItem.totalTaskWorkPlanned.toFixed(1)}/{tableItem.totalTaskWorkLeft.toFixed(1)}</Badge>
-            </h5>
+            <Pill className={`custom-pill ${pillClass}`}>{tableItem.totalTaskWorkDone.toFixed(1)}/{tableItem.totalTaskWorkPlanned.toFixed(1)}/{tableItem.totalTaskWorkLeft.toFixed(1)}</Pill>
         </SimpleTableCell>
     );
 }
@@ -236,11 +236,17 @@ function renderProgressColumn(
             key={"col-" + columnIndex}
             contentClassName="fontWeightSemiBold font-weight-semibold fontSizeM font-size-m scroll-hidden"
         >
-            <ProgressBar className={"flex-grow"}>
-                <ProgressBar variant="success" now={porcentagemDone} label={`${tableItem.doneTaskCount} Done`} key={1} />
-                <ProgressBar animated now={porcentagemInProgress} label={`${tableItem.inProgressTaskCount} In Progress`} key={2} />
-                <ProgressBar className={"bg-secondary"} now={porcentagemTodo} label={`${tableItem.todoTasksCount} To Do`} key={3} />
-            </ProgressBar>
+            <div className="flex-row flex-stretch" style={{ width: '100%' }}>
+                <div style={{ width: `${porcentagemDone}%` }}>
+                    <Pill className={`progress-pill pill-left`}>{`${tableItem.doneTaskCount} Done`}</Pill>
+                </div>
+                <div style={{ width: `${porcentagemInProgress}%` }}>
+                    <Pill className={`progress-pill pill-center`}>{`${tableItem.inProgressTaskCount} In Progress`}</Pill>
+                </div>
+                <div style={{ width: `${porcentagemTodo}%` }}>
+                    <Pill className={`progress-pill pill-right`}>{`${tableItem.todoTasksCount} To Do`}</Pill>
+                </div>
+            </div>
         </SimpleTableCell>
     );
 }

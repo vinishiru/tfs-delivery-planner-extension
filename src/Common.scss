@@ -1,5 +1,46 @@
+@import "../node_modules/azure-devops-ui/Core/override.scss";
+@import "../node_modules/azure-devops-ui/Core/platformCommon";
+
 #root {
     height: 100%;
     width: 100%;
     display: flex;
+}
+
+.custom-pill {
+    font-weight: bold;
+    font-size: 1rem !important;
+    border-radius: 10px !important;
+}
+
+.custom-pill.pill-default {
+    background-color: rgba(0, 120, 212, 1);
+    color: white;
+}
+
+.custom-pill.pill-danger {
+    background-color: rgba(205, 74, 69, 1);
+    color: white;
+}
+
+.progress-pill {
+    font-weight: lighter;
+    font-size: 1rem !important;
+    border-radius: 10px !important;
+    color: white;
+}
+
+.progress-pill.pill-left {
+    border-radius: 10px 0px 0px 10px !important;
+    background-color: rgba(16, 124, 16, 1);
+}
+
+.progress-pill.pill-right {
+    border-radius: 0px 10px 10px 0px !important;
+    background-color: rgba(102, 102, 102, 1);
+}
+
+.progress-pill.pill-center {
+    border-radius: 0px !important;
+    background-color: rgba(0, 120, 212, 1);
 }

@@ -152,7 +152,7 @@ export class MoqAzureDevOpsService implements IAzureDevOpsService {
             effort: 10,
             column: "Dev Done",
             totalTaskWorkPlanned: 80,
-            totalTaskWorkDone: 90,
+            totalTaskWorkDone: 40,
             totalTaskWorkLeft: 10,
             todoTasksCount: 8,
             inProgressTaskCount: 4,

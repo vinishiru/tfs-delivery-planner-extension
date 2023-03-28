@@ -1,4 +1,6 @@
 import { Link } from "azure-devops-ui/Components/Link/Link";
+import { Pill } from "azure-devops-ui/Components/Pill/Pill";
+import { PillSize } from "azure-devops-ui/Components/Pill/Pill.Props";
 import { Status } from "azure-devops-ui/Components/Status/Status";
 import { StatusSize } from "azure-devops-ui/Components/Status/Status.Props";
 import { renderColumns, renderEmptyCell, renderSimpleCell, SimpleTableCell, Table, TableRow } from "azure-devops-ui/Components/Table/Table";
@@ -6,7 +8,6 @@ import { ITableColumn } from "azure-devops-ui/Components/Table/Table.Props";
 import { ObservableValue, useObservable } from "azure-devops-ui/Core/Observable";
 import { ArrayItemProvider } from "azure-devops-ui/Utilities/Provider";
 import React, { useEffect, useState } from "react";
-import Badge from "react-bootstrap/Badge";
 import SdkService from "..";
 import { IRelatedWitTableItem, IRelatedWitTaskTableItem, onSizeSizable, sizableColumns } from "./DeliveryItemCard";
 const Fade = require('react-reveal/Fade');
@@ -98,6 +99,8 @@ function renderTaskWorkCell(
     tableItem: IRelatedWitTaskTableItem
 ): JSX.Element {
     const deadlineReached = tableItem.workDone > tableItem.workPlanned;
+    const pillClass = deadlineReached ? 'pill-danger' : 'pill-default';
+
     return (
         <SimpleTableCell
             columnIndex={columnIndex}
@@ -105,9 +108,7 @@ function renderTaskWorkCell(
             key={"col-" + columnIndex}
             contentClassName="fontWeightSemiBold font-weight-semibold fontSizeM font-size-m scroll-hidden"
         >
-            <h5>
-                <Badge variant={deadlineReached ? "danger" : "primary"}>{tableItem.workDone.toFixed(1)}/{tableItem.workPlanned.toFixed(1)}/{tableItem.workLeft.toFixed(1)}</Badge>
-            </h5>
+            <Pill className={`custom-pill ${pillClass}`}>{tableItem.workDone.toFixed(1)}/{tableItem.workPlanned.toFixed(1)}/{tableItem.workLeft.toFixed(1)}</Pill>
         </SimpleTableCell>
     );
 }

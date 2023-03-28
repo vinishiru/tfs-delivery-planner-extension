@@ -112,7 +112,7 @@ class DeliveryPlanner extends React.Component<{}, IDeliveryPlannerState> {
                             <p>Olá {this.state.userDisplayName}!</p>
                             <p>
                                 Planeje entregas, facilite o acompanhamento dos seus projetos e tenha uma <strong>estimativa</strong> de entrega!
-                        </p>
+                            </p>
                         </div>
                     }
                     imageAltText="Delivery Planner"
